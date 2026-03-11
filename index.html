@@ -366,7 +366,7 @@
         };
 
         // 1. Hero Section
-        const HeroSection = ({ profileName, onEditProfile, data, totalCars, onShare, onUpload, onExport, onAdd, onReset, onVoteClick, onRefreshClick, isRefreshing }) => {
+        const HeroSection = ({ profileName, onEditProfile, data, totalCars, onShare, onUpload, onAdd, onReset, onVoteClick, onRefreshClick, isRefreshing }) => {
             const bgImages = [
                 "https://images.pexels.com/photos/3752194/pexels-photo-3752194.jpeg?auto=compress&cs=tinysrgb&w=1920",
                 "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=1920",
@@ -385,9 +385,11 @@
             return (
                 <div className="relative py-12 md:py-24 border-b border-border overflow-hidden w-full">
                     <div className="absolute top-4 right-4 md:top-6 md:right-8 z-50 flex items-center gap-3 flex-wrap justify-end">
-                        <button onClick={onRefreshClick} disabled={isRefreshing} className="flex items-center gap-2 bg-dark text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-border transition border border-border shadow-md">
-                            <IconRefresh spinning={isRefreshing} /> {isRefreshing ? 'Syncing...' : 'Sync Data'}
-                        </button>
+                        {totalCars > 0 && (
+                            <button onClick={onRefreshClick} disabled={isRefreshing} className="flex items-center gap-2 bg-dark text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-border transition border border-border shadow-md">
+                                <IconRefresh spinning={isRefreshing} /> {isRefreshing ? 'Syncing...' : 'Sync Data'}
+                            </button>
+                        )}
                         <button onClick={onVoteClick} className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-accent text-white px-4 py-1.5 rounded-full text-xs font-bold hover:scale-105 transition shadow-[0_0_15px_rgba(225,29,72,0.4)] animate-pulse border border-white/20">
                             <IconVote /> Vote Today's Car
                         </button>
@@ -444,7 +446,10 @@
                                 <input type="file" accept=".xlsx, .xls, .csv, .json" className="hidden" onChange={onUpload} />
                             </label>
                             {totalCars > 0 && (
-                                <button onClick={onExport} className="bg-card hover:bg-border text-white text-sm px-4 py-2.5 rounded-full border border-border transition flex items-center gap-2 font-medium hidden sm:flex">
+                                <button onClick={()=>{
+                                    const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+                                    a.download = "Carbiography.json"; document.body.appendChild(a); a.click(); a.remove();
+                                }} className="bg-card hover:bg-border text-white text-sm px-4 py-2.5 rounded-full border border-border transition flex items-center gap-2 font-medium hidden sm:flex">
                                     <IconDownload /> JSON
                                 </button>
                             )}
@@ -1291,8 +1296,8 @@
                             
                             {/* CANLI BAĞLANTI İNDİKATÖRÜ */}
                             <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]"></span>
-                                <span className="text-[10px] text-white font-bold tracking-widest uppercase">Live</span>
+                                <span className={`w-2 h-2 rounded-full ${isFirebaseEnabled ? 'bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]'}`}></span>
+                                <span className="text-[10px] text-white font-bold tracking-widest uppercase">{isFirebaseEnabled ? 'Live' : 'Offline'}</span>
                             </div>
 
                             <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 bg-black/50 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
@@ -1309,7 +1314,7 @@
                             
                             {!isFirebaseEnabled && (
                                 <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-6 text-sm text-red-400 text-left">
-                                    ⚠️ <b>Sistem Çevrimdışı:</b> Kodda Firebase ayarları girilmediği için bulut oylama özelliği şu an kullanılamıyor.
+                                    ⚠️ <b>Offline Mode:</b> Cloud voting is currently disabled. Please add your Firebase config to index.html to enable global voting.
                                 </div>
                             )}
 
@@ -1341,7 +1346,7 @@
                                 ) : (
                                     <div>
                                         <p className="text-gray-300 mb-4 font-medium">Rate this car:</p>
-                                        <div className="flex justify-center gap-2 mb-4">
+                                        <div className={`flex justify-center gap-2 mb-4 ${!isFirebaseEnabled ? 'opacity-50 pointer-events-none' : ''}`}>
                                             {[1, 2, 3, 4, 5].map((star) => (
                                                 <button 
                                                     key={star} 
@@ -1658,7 +1663,7 @@
             const [confirmModalConfig, setConfirmModalConfig] = React.useState({ isOpen: false, title: '', message: '', onConfirm: null, confirmText: '' });
 
             const [refreshCounter, setRefreshCounter] = React.useState(0);
-            const [isFetchingDemo, setIsFetchingDemo] = React.useState(true);
+            const [isFetchingDemo, setIsFetchingDemo] = React.useState(false);
 
             // --- FIREBASE USER STATE ---
             const [user, setUser] = React.useState(null);
@@ -1687,46 +1692,52 @@
                 }
             }, []);
 
-            // --- 🚀 AUTO FETCH DEMO EXCEL ON MOUNT 🚀 ---
+            // Yalnızca LocalStorage Kontrolü (Açılışta)
             React.useEffect(() => {
-                const fetchDemoFile = async () => {
-                    const filesToTry = ['./demo.xlsx', './demo.csv']; 
-                    
-                    for (const file of filesToTry) {
-                        try {
-                            const response = await fetch(file, { cache: 'no-store' });
-                            if (response.ok) {
-                                const arrayBuffer = await response.arrayBuffer();
-                                const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-                                const jd = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                                const validCars = jd.filter(r => r.Make);
-                                
-                                if (validCars.length > 0) {
-                                    setData(validCars);
-                                    setProfileName("Yigit"); 
-                                    setIsFetchingDemo(false);
-                                    return; 
-                                }
-                            }
-                        } catch (error) {
-                            console.warn(`No local ${file} found or fetch failed. Checking local storage...`);
+                const saved = localStorage.getItem("carbio_data");
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        if (parsed && parsed.length > 0) {
+                            setData(parsed);
                         }
-                    }
-                    
-                    const saved = localStorage.getItem("carbio_data");
-                    if (saved) {
-                        try {
-                            const parsed = JSON.parse(saved);
-                            if (parsed && parsed.length > 0) {
-                                setData(parsed);
-                            }
-                        } catch(e) {}
-                    }
-                    setIsFetchingDemo(false);
-                };
-
-                fetchDemoFile();
+                    } catch(e) {}
+                }
             }, []);
+
+            // --- DEMO PORTFOLIO YÜKLEYİCİ ---
+            const loadDemoData = async () => {
+                setIsFetchingDemo(true);
+                const filesToTry = ['./demo.xlsx', './demo.csv']; 
+                let isLoaded = false;
+                
+                for (const file of filesToTry) {
+                    try {
+                        const response = await fetch(file, { cache: 'no-store' });
+                        if (response.ok) {
+                            const arrayBuffer = await response.arrayBuffer();
+                            const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+                            const jd = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                            const validCars = jd.filter(r => r.Make);
+                            
+                            if (validCars.length > 0) {
+                                setData(validCars);
+                                setProfileName("Yigit"); // Demo profil ismi
+                                isLoaded = true;
+                                break; 
+                            }
+                        }
+                    } catch (error) {
+                        console.warn(`${file} yüklenemedi.`);
+                    }
+                }
+
+                if (!isLoaded) {
+                    alert("Demo dosya bulunamadı. Lütfen ana dizinde 'demo.xlsx' veya 'demo.csv' olduğundan emin olun.");
+                }
+                
+                setIsFetchingDemo(false);
+            };
 
             // --- MANUAL REFRESH BUTTON ---
             const triggerRefresh = async () => {
@@ -1792,42 +1803,41 @@
                         onShare={() => setShareOpen(true)} onReset={handleReset}
                         onVoteClick={() => setVoteModalOpen(true)}
                         onRefreshClick={triggerRefresh} isRefreshing={isFetchingDemo}
-                        onExport={()=>{
-                            const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-                            a.download = "Carbiography.json"; document.body.appendChild(a); a.click(); a.remove();
-                        }}
                     />
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-8">
-                        {isFetchingDemo ? (
-                            <div className="py-24 text-center flex flex-col items-center">
-                                <IconRefresh spinning={true} className="w-12 h-12 text-accent mb-4" />
-                                <h2 className="text-2xl font-display font-bold text-white mb-2">Loading your garage...</h2>
-                                <p className="text-gray-400">Fetching local data from the server</p>
-                            </div>
-                        ) : data.length > 0 ? (
+                        {data.length > 0 ? (
                             <>
                                 <DeepInsights data={data} totalCO2={totalCO2} totalDistance={totalDistance} />
                                 <Timeline data={data} onCarClick={setSelectedCar} />
                                 <CollectionGrid data={data} onCarClick={setSelectedCar} />
                             </>
                         ) : (
-                            <div className="py-16 md:py-24 text-center flex flex-col items-center max-w-2xl mx-auto animate-fade-in">
+                            <div className="py-16 md:py-24 text-center flex flex-col items-center max-w-3xl mx-auto animate-fade-in">
                                 <div className="w-20 h-20 bg-dark border border-border rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(225,29,72,0.2)]">
                                     <IconMagic />
                                 </div>
                                 <h2 className="text-3xl font-display font-bold text-white mb-4">Welcome to your Carbiography</h2>
-                                <p className="text-gray-400 mb-8 leading-relaxed">
-                                    If a <b>demo.xlsx</b> file is placed in your root directory, it will automatically load here.<br/>
-                                    Otherwise, you can start building your automotive timeline manually.
+                                <p className="text-gray-400 mb-10 leading-relaxed max-w-xl mx-auto">
+                                    Start building your automotive timeline manually, or if you want to see how the dashboard looks fully populated, you can load the demo portfolio.
                                 </p>
 
-                                <div className="bg-dark border border-border rounded-2xl p-6 mb-8 text-left w-full">
-                                    <h3 className="text-accent font-bold uppercase tracking-widest text-xs mb-4">How to add a car?</h3>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-lg mx-auto mb-10">
+                                    <button onClick={() => setAddModalOpen(true)} className="bg-accent hover:bg-accentHover text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(225,29,72,0.4)] w-full">
+                                        <IconPlus /> Add Your First Car
+                                    </button>
+                                    
+                                    <button onClick={loadDemoData} disabled={isFetchingDemo} className="bg-dark border border-border hover:bg-border text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 w-full shadow-lg">
+                                        {isFetchingDemo ? <IconRefresh spinning={true} /> : "🏁 Try Demo Portfolio"}
+                                    </button>
+                                </div>
+
+                                <div className="bg-dark border border-border rounded-2xl p-6 text-left w-full max-w-2xl mx-auto">
+                                    <h3 className="text-accent font-bold uppercase tracking-widest text-xs mb-4">How manual entry works?</h3>
                                     <ul className="space-y-4 text-sm text-gray-300">
                                         <li className="flex gap-3 items-start">
                                             <span className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shrink-0 font-bold text-white text-xs">1</span>
-                                            <div>Click the <b>Add Car</b> button below.</div>
+                                            <div>Click the <b>Add Car</b> button.</div>
                                         </li>
                                         <li className="flex gap-3 items-start">
                                             <span className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shrink-0 font-bold text-white text-xs">2</span>
@@ -1839,10 +1849,6 @@
                                         </li>
                                     </ul>
                                 </div>
-
-                                <button onClick={() => setAddModalOpen(true)} className="bg-accent hover:bg-accentHover text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(225,29,72,0.4)] w-full sm:w-auto">
-                                    <IconPlus /> Add Your First Car
-                                </button>
                             </div>
                         )}
                         
