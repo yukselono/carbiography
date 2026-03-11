@@ -86,7 +86,7 @@
         const IconTicket = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 12h20M7 5v14M17 5v14"></path></svg>;
         const IconGamepad = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><path d="M22 12a10 10 0 0 0-20 0v2a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5v-2z"></path></svg>;
         const IconVote = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>;
-        const IconRefresh = ({ spinning }) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={spinning ? "animate-spin" : ""}><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>;
+        const IconRefresh = ({ spinning, className }) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`${spinning ? "animate-spin" : ""} ${className}`}><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>;
 
         // --- MOCK API DATABASE FOR SMART AUTOFILL ---
         const localCarDB = [
@@ -103,34 +103,6 @@
             { Make: 'Volvo', Model: 'XC40', Power: 252, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Luxury' },
             { Make: 'Aston Martin', Model: 'Vantage', Power: 503, Engine: 4.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
             { Make: 'Ferrari', Model: '458', Power: 570, Engine: 4.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' }
-        ];
-
-        // --- EXTENDED DEMO CAR DATA (From CSV) ---
-        const myDemoData = [
-            { "#": 1, Make: "Alfa Romeo", Model: "Giulietta", "Model Year": "2012", "Driving Year": "2012", Power: 170, Engine: 1.4, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 6, Status: "Test", "Mileage (est)": 10, Story: "A quick test drive of this Italian beauty. The dynamic mode was surprisingly punchy." },
-            { "#": 2, Make: "Aston Martin", Model: "DB9", "Model Year": "2015", "Driving Year": "2015", Power: 547, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "Driving a British aristocrat on the frozen lakes of Sweden. An unforgettable V12 symphony." },
-            { "#": 3, Make: "Aston Martin", Model: "Vanquish", "Model Year": "2015", "Driving Year": "2015", Power: 577, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "Even more aggressive than the DB9. The carbon fiber details and the roar echoing through the snowy forests." },
-            { "#": 4, Make: "Aston Martin", Model: "Vantage V12", "Model Year": "2015", "Driving Year": "2015", Power: 517, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "The smallest chassis with the biggest engine. An absolute beast to handle on ice." },
-            { "#": 5, Make: "Audi", Model: "S3", "Model Year": "2017", "Driving Year": "2017-2023", Power: 300, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Performance", Country: "Turkey", Points: 10, Status: "Owned", "Mileage (est)": 65000, Story: "My reliable companion for years. The Quattro system never failed me, a true daily performance car." },
-            { "#": 6, Make: "Audi", Model: "Q7", "Model Year": "2016", "Driving Year": "2018", Power: 272, Engine: 3.0, Fuel: "Diesel", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "UK", Points: 8, Status: "Rental", "Mileage (est)": 500, Story: "Cruising through the Scottish Highlands. Extremely comfortable and commanding presence." },
-            { "#": 7, Make: "BMW", Model: "M3", "Model Year": "2018", "Driving Year": "2019", Power: 431, Engine: 3.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Germany", Points: 9, Status: "Test", "Mileage (est)": 50, Story: "Autobahn testing. The acceleration and stability at high speeds are mind-blowing." },
-            { "#": 8, Make: "BMW", Model: "X1", "Model Year": "2025", "Driving Year": "2025", Power: 245, Engine: 1.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 8, Status: "Rental", "Mileage (est)": 1800, Story: "Navigated the majestic fjords of Norway. The hybrid system was very efficient." },
-            { "#": 9, Make: "BYD", Model: "Seal", "Model Year": "2024", "Driving Year": "2024", Power: 313, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "RWD", Segment: "Luxury", Country: "Turkey", Points: 9, Status: "Owned", "Mileage (est)": 15000, Story: "My leap into the electric revolution. Impressive tech and great range." },
-            { "#": 10, Make: "Ferrari", Model: "458 Spider", "Model Year": "2014", "Driving Year": "2014", Power: 570, Engine: 4.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Supercar", Country: "Italy", Points: 10, Status: "Rental", "Mileage (est)": 400, Story: "Roof down, naturally aspirated V8 screaming in the Italian countryside. Pure magic." },
-            { "#": 11, Make: "Ferrari", Model: "GTC4Lusso", "Model Year": "2018", "Driving Year": "2023", Power: 690, Engine: 6.3, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Supercar", Country: "Italy", Points: 9, Status: "Rental", "Mileage (est)": 800, Story: "A practical Ferrari? Yes. But when you step on the gas, the V12 reminds you what it really is." },
-            { "#": 12, Make: "Fiat", Model: "500", "Model Year": "2018", "Driving Year": "2018", Power: 69, Engine: 1.2, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 5, Status: "Rental", "Mileage (est)": 500, Story: "Small, practical, and perfect for tight city streets." },
-            { "#": 13, Make: "Ford", Model: "Fiesta", "Model Year": "2016", "Driving Year": "2016", Power: 100, Engine: 1.0, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 7, Status: "Rental", "Mileage (est)": 300, Story: "A surprisingly fun little car with a brilliant chassis." },
-            { "#": 14, Make: "Mercedes", Model: "S-Class", "Model Year": "2010", "Driving Year": "2010", Power: 517, Engine: 5.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Test", "Mileage (est)": 50, Story: "Like floating on a cloud. The ultimate luxury benchmark." },
-            { "#": 15, Make: "Toyota", Model: "RAV4", "Model Year": "2023", "Driving Year": "2023", Power: 306, Engine: 2.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 9, Status: "Rental", "Mileage (est)": 2500, Story: "Conquered the harsh Norwegian winter without a single issue." },
-            { "#": 16, Make: "Volkswagen", Model: "Golf TDI", "Model Year": "2012", "Driving Year": "2015", Power: 105, Engine: 1.6, Fuel: "Diesel", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "UK", Points: 6, Status: "Rental", "Mileage (est)": 2000, Story: "The standard metric for a hatchback. Drove all over the UK." },
-            { "#": 17, Make: "Volkswagen", Model: "Tiguan", "Model Year": "2015", "Driving Year": "2016", Power: 150, Engine: 2.0, Fuel: "Diesel", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 7, Status: "Rental", "Mileage (est)": 1500, Story: "A solid, dependable SUV for a road trip." },
-            { "#": 18, Make: "Volkswagen", Model: "Polo", "Model Year": "2020", "Driving Year": "2021", Power: 90, Engine: 1.6, Fuel: "Diesel", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 5, Status: "Friend", "Mileage (est)": 250, Story: "Economical and practical for daily errands." },
-            { "#": 19, Make: "Volkswagen", Model: "Caravelle", "Model Year": "2012", "Driving Year": "2014", Power: 180, Engine: 2.0, Fuel: "Diesel", Transmission: "Manual", Drive: "FWD", Segment: "Minivan", Country: "Turkey", Points: 6, Status: "Friend", "Mileage (est)": 100, Story: "Great for a large group trip, lots of space and torque." },
-            { "#": 20, Make: "Volkswagen", Model: "T-Cross", "Model Year": "2024", "Driving Year": "2024", Power: 115, Engine: 1.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 6, Status: "Rental", "Mileage (est)": 2000, Story: "Compact crossover that did the job perfectly." },
-            { "#": 21, Make: "Volkswagen", Model: "Up!", "Model Year": "2025", "Driving Year": "2025", Power: 90, Engine: 1.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 6, Status: "Rental", "Mileage (est)": 300, Story: "The ultimate city runabout." },
-            { "#": 22, Make: "Volvo", Model: "XC40", "Model Year": "2024", "Driving Year": "2024", Power: 252, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Leasing", "Mileage (est)": 12000, Story: "Safe, minimalistic, and a very smooth electric drive." },
-            { "#": 23, Make: "Volvo", Model: "S60", "Model Year": "2025", "Driving Year": "2025", Power: 310, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "USA", Points: 7, Status: "Friend", "Mileage (est)": 600, Story: "A highly comfortable cruiser for long American highways." },
-            { "#": 24, Make: "KGM", Model: "Torres EVX", "Model Year": "2025", "Driving Year": "2025", Power: 207, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "FWD", Segment: "SUV", Country: "Turkey", Points: 7, Status: "Test", "Mileage (est)": 200, Story: "Interesting design and practical EV capability." }
         ];
 
         // --- AUTOMOTIVE CULTURAL INTELLIGENCE (GAMES, MOVIES, RARITY) ---
@@ -211,13 +183,10 @@
         };
 
         // --- GEMINI API INTEGRATION (ROBUST ERROR HANDLING) ---
-        // For local / GitHub Pages, we will ask user for an API key if the injected one is empty.
         const callGemini = async (prompt, systemPrompt = "You are an expert automotive critic and AI assistant.") => {
-            // By default Canvas environment provides the key
-            const injectedKey = ""; 
+            const injectedKey = "AIzaSyBpNn8zotNo11CaO-Xv7Ypf8R5F7eaGMI8"; 
             let activeApiKey = injectedKey;
 
-            // Fallback for Github Pages or Local
             if (!activeApiKey || activeApiKey === "") {
                 activeApiKey = localStorage.getItem('carbio_gemini_key') || "";
                 if (!activeApiKey || activeApiKey === "") {
@@ -238,7 +207,7 @@
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
 
-            const delays = [1000, 2000, 4000, 8000, 16000]; // Exponential backoff rule
+            const delays = [1000, 2000, 4000, 8000, 16000]; 
             
             for (let i = 0; i <= delays.length; i++) {
                 try {
@@ -250,7 +219,6 @@
                     const data = await response.json();
                     
                     if (!response.ok) {
-                        // If it's a key error, clear the localstorage so it asks again next time
                         if (data.error?.message?.includes("API key not valid") || data.error?.message?.includes("unregistered")) {
                             localStorage.removeItem('carbio_gemini_key');
                         }
@@ -363,7 +331,7 @@
                 <div className="relative py-12 md:py-24 border-b border-border overflow-hidden w-full">
                     <div className="absolute top-4 right-4 md:top-6 md:right-8 z-50 flex items-center gap-3 flex-wrap justify-end">
                         <button onClick={onRefreshClick} disabled={isRefreshing} className="flex items-center gap-2 bg-dark text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-border transition border border-border shadow-md">
-                            <IconRefresh spinning={isRefreshing} /> {isRefreshing ? 'Refreshing...' : 'Refresh Feed'}
+                            <IconRefresh spinning={isRefreshing} /> {isRefreshing ? 'Syncing...' : 'Sync Data'}
                         </button>
                         <button onClick={onVoteClick} className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-accent text-white px-4 py-1.5 rounded-full text-xs font-bold hover:scale-105 transition shadow-[0_0_15px_rgba(225,29,72,0.4)] animate-pulse border border-white/20">
                             <IconVote /> Vote Today's Car
@@ -745,14 +713,6 @@
                         </div>
 
                         <div className="p-6 md:p-8 overflow-y-auto">
-                            {/* Personal Story Layer */}
-                            {car.Story && (
-                                <div className="mb-8 p-6 bg-dark border-l-4 border-accent rounded-r-2xl relative">
-                                    <div className="absolute top-2 left-2 text-4xl text-white/10 font-display">"</div>
-                                    <h4 className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">My Driving Story</h4>
-                                    <p className="text-gray-300 italic relative z-10 leading-relaxed">{car.Story}</p>
-                                </div>
-                            )}
 
                             {/* Automotive Data Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 mb-8">
@@ -821,18 +781,28 @@
                                 </div>
                             </div>
 
-                            {/* AI Review & Video */}
+                            {/* My Driving Story & Action Video */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
-                                        <h4 className="font-display font-bold text-lg text-white">Automotive Summary</h4>
+                                        <h4 className="font-display font-bold text-lg text-white">My Driving Story</h4>
                                         <button onClick={generateAiStory} disabled={isGeneratingStory} className="text-[10px] bg-accent/20 hover:bg-accent text-accent hover:text-white px-2 py-1 rounded transition flex items-center gap-1 font-bold border border-accent/30">
                                             {isGeneratingStory ? '✨ Generating...' : '✨ Write AI Story'}
                                         </button>
                                     </div>
-                                    <p className="text-sm text-gray-400 leading-relaxed bg-dark p-5 rounded-xl border border-border h-full whitespace-pre-line">
-                                        {aiStory || generatedReview}
-                                    </p>
+                                    <div className="bg-dark p-5 rounded-xl border border-border h-full flex flex-col gap-5">
+                                        {car.Story && (
+                                            <div className="border-l-2 border-accent pl-4 relative">
+                                                <div className="absolute -top-3 -left-2 text-4xl text-accent/20 font-display">"</div>
+                                                <p className="text-gray-200 italic text-sm leading-relaxed relative z-10">{car.Story}</p>
+                                            </div>
+                                        )}
+                                        <div className={`${car.Story ? 'pt-4 border-t border-border' : ''}`}>
+                                            <p className="text-sm text-gray-400 leading-relaxed whitespace-pre-line">
+                                                {aiStory || generatedReview}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
                                     <h4 className="font-display font-bold text-lg mb-3 text-white">Action Video</h4>
@@ -1108,6 +1078,118 @@
                         <div className="flex gap-3">
                             <button onClick={onClose} className="flex-1 py-3 bg-dark border border-border rounded-xl text-sm font-medium text-gray-300 hover:text-white transition">Cancel</button>
                             <button onClick={onConfirm} className="flex-1 bg-accent hover:bg-accentHover text-white font-bold py-3 rounded-xl transition shadow-[0_0_15px_rgba(225,29,72,0.3)]">{confirmText}</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DailyVoteModal = ({ isOpen, onClose }) => {
+            const [rating, setRating] = React.useState(0);
+            const [hoverRating, setHoverRating] = React.useState(0);
+            const [voted, setVoted] = React.useState(false);
+            const [carImg, setCarImg] = React.useState('');
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            let hash = 0;
+            for (let i = 0; i < todayStr.length; i++) hash = todayStr.charCodeAt(i) + ((hash << 5) - hash);
+            const carIndex = Math.abs(hash) % localCarDB.length;
+            const dailyCar = localCarDB[carIndex];
+
+            React.useEffect(() => {
+                const savedVote = localStorage.getItem(`carbio_daily_vote_${todayStr}`);
+                if (savedVote) {
+                    setRating(Number(savedVote));
+                    setVoted(true);
+                } else {
+                    setRating(0);
+                    setVoted(false);
+                }
+            }, [isOpen, todayStr]);
+
+            React.useEffect(() => {
+                if (!isOpen || !dailyCar) return;
+                
+                setCarImg('');
+                const queryBrandModel = encodeURIComponent(`${dailyCar.Make} ${dailyCar.Model}`);
+                
+                fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${queryBrandModel}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=800&origin=*`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const pages = data.query?.pages;
+                        if (pages && Object.keys(pages)[0] !== "-1" && Object.values(pages)[0].thumbnail) {
+                            setCarImg(Object.values(pages)[0].thumbnail.source);
+                        }
+                    }).catch(() => {});
+            }, [isOpen, dailyCar]);
+
+            if (!isOpen) return null;
+
+            const handleVote = (val) => {
+                if (voted) return;
+                setRating(val);
+                setVoted(true);
+                localStorage.setItem(`carbio_daily_vote_${todayStr}`, val.toString());
+            };
+
+            const fallbackImg = "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=800";
+
+            return (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={onClose}>
+                    <div className="bg-card w-full max-w-md rounded-3xl border border-border text-center relative overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.1)] flex flex-col" onClick={e=>e.stopPropagation()}>
+                        
+                        <div className="h-48 w-full relative bg-dark shrink-0">
+                            <img src={carImg || fallbackImg} className="w-full h-full object-cover opacity-60 mix-blend-luminosity" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
+                            <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 bg-black/50 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
+                        </div>
+                        
+                        <div className="px-8 pb-8 relative -mt-8 z-10 flex-1 flex flex-col">
+                            <div className="w-16 h-16 bg-gradient-to-br from-accent to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg border-4 border-card relative z-20">
+                                <IconVote />
+                            </div>
+                            
+                            <h3 className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Car of the Day</h3>
+                            <h2 className="text-3xl font-display font-bold text-white mb-1">{dailyCar.Make}</h2>
+                            <h3 className="text-xl font-light text-gray-300 mb-6">{dailyCar.Model} <span className="text-accent font-bold">({dailyCar.Power} HP)</span></h3>
+                            
+                            <div className="bg-dark border border-border rounded-xl p-3 mb-8 text-sm text-gray-400 flex justify-center gap-3 mx-auto flex-wrap w-full">
+                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Engine > 0 ? `${dailyCar.Engine}L ` : ''}{dailyCar.Fuel}</span>
+                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Transmission}</span>
+                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Drive}</span>
+                            </div>
+
+                            <div className="mt-auto">
+                                {voted ? (
+                                    <div className="animate-fade-in bg-green-500/10 border border-green-500/20 p-4 rounded-2xl">
+                                        <p className="text-green-400 font-bold mb-3 text-sm">Thanks for voting today!</p>
+                                        <div className="flex justify-center gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <svg key={star} width="20" height="20" viewBox="0 0 24 24" fill={star <= rating ? "#E11D48" : "none"} stroke={star <= rating ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                            ))}
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 mt-3 uppercase tracking-widest">Come back tomorrow</p>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="text-gray-300 mb-4 font-medium">Rate this car:</p>
+                                        <div className="flex justify-center gap-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button 
+                                                    key={star} 
+                                                    onMouseEnter={() => setHoverRating(star)} 
+                                                    onMouseLeave={() => setHoverRating(0)}
+                                                    onClick={() => handleVote(star)}
+                                                    className="transition-transform hover:scale-125 focus:outline-none"
+                                                >
+                                                    <svg width="36" height="36" viewBox="0 0 24 24" fill={(hoverRating || rating) >= star ? "#E11D48" : "none"} stroke={(hoverRating || rating) >= star ? "#E11D48" : "#4B5563"} strokeWidth="2" className="transition-colors duration-200 drop-shadow-md"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1416,118 +1498,6 @@
             );
         };
 
-        const DailyVoteModal = ({ isOpen, onClose }) => {
-            const [rating, setRating] = React.useState(0);
-            const [hoverRating, setHoverRating] = React.useState(0);
-            const [voted, setVoted] = React.useState(false);
-            const [carImg, setCarImg] = React.useState('');
-            
-            const todayStr = new Date().toISOString().split('T')[0];
-            
-            let hash = 0;
-            for (let i = 0; i < todayStr.length; i++) hash = todayStr.charCodeAt(i) + ((hash << 5) - hash);
-            const carIndex = Math.abs(hash) % localCarDB.length;
-            const dailyCar = localCarDB[carIndex];
-
-            React.useEffect(() => {
-                const savedVote = localStorage.getItem(`carbio_daily_vote_${todayStr}`);
-                if (savedVote) {
-                    setRating(Number(savedVote));
-                    setVoted(true);
-                } else {
-                    setRating(0);
-                    setVoted(false);
-                }
-            }, [isOpen, todayStr]);
-
-            React.useEffect(() => {
-                if (!isOpen || !dailyCar) return;
-                
-                setCarImg('');
-                const queryBrandModel = encodeURIComponent(`${dailyCar.Make} ${dailyCar.Model}`);
-                
-                fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${queryBrandModel}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=800&origin=*`)
-                    .then(res => res.json())
-                    .then(data => {
-                        const pages = data.query?.pages;
-                        if (pages && Object.keys(pages)[0] !== "-1" && Object.values(pages)[0].thumbnail) {
-                            setCarImg(Object.values(pages)[0].thumbnail.source);
-                        }
-                    }).catch(() => {});
-            }, [isOpen, dailyCar]);
-
-            if (!isOpen) return null;
-
-            const handleVote = (val) => {
-                if (voted) return;
-                setRating(val);
-                setVoted(true);
-                localStorage.setItem(`carbio_daily_vote_${todayStr}`, val.toString());
-            };
-
-            const fallbackImg = "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=800";
-
-            return (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={onClose}>
-                    <div className="bg-card w-full max-w-md rounded-3xl border border-border text-center relative overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.1)] flex flex-col" onClick={e=>e.stopPropagation()}>
-                        
-                        <div className="h-48 w-full relative bg-dark shrink-0">
-                            <img src={carImg || fallbackImg} className="w-full h-full object-cover opacity-60 mix-blend-luminosity" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
-                            <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 bg-black/50 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
-                        </div>
-                        
-                        <div className="px-8 pb-8 relative -mt-8 z-10 flex-1 flex flex-col">
-                            <div className="w-16 h-16 bg-gradient-to-br from-accent to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg border-4 border-card relative z-20">
-                                <IconVote />
-                            </div>
-                            
-                            <h3 className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Car of the Day</h3>
-                            <h2 className="text-3xl font-display font-bold text-white mb-1">{dailyCar.Make}</h2>
-                            <h3 className="text-xl font-light text-gray-300 mb-6">{dailyCar.Model} <span className="text-accent font-bold">({dailyCar.Power} HP)</span></h3>
-                            
-                            <div className="bg-dark border border-border rounded-xl p-3 mb-8 text-sm text-gray-400 flex justify-center gap-3 mx-auto flex-wrap w-full">
-                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Engine > 0 ? `${dailyCar.Engine}L ` : ''}{dailyCar.Fuel}</span>
-                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Transmission}</span>
-                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Drive}</span>
-                            </div>
-
-                            <div className="mt-auto">
-                                {voted ? (
-                                    <div className="animate-fade-in bg-green-500/10 border border-green-500/20 p-4 rounded-2xl">
-                                        <p className="text-green-400 font-bold mb-3 text-sm">Thanks for voting today!</p>
-                                        <div className="flex justify-center gap-1">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <svg key={star} width="20" height="20" viewBox="0 0 24 24" fill={star <= rating ? "#E11D48" : "none"} stroke={star <= rating ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                            ))}
-                                        </div>
-                                        <p className="text-[10px] text-gray-500 mt-3 uppercase tracking-widest">Come back tomorrow</p>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p className="text-gray-300 mb-4 font-medium">Rate this car:</p>
-                                        <div className="flex justify-center gap-2">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button 
-                                                    key={star} 
-                                                    onMouseEnter={() => setHoverRating(star)} 
-                                                    onMouseLeave={() => setHoverRating(0)}
-                                                    onClick={() => handleVote(star)}
-                                                    className="transition-transform hover:scale-125 focus:outline-none"
-                                                >
-                                                    <svg width="36" height="36" viewBox="0 0 24 24" fill={(hoverRating || rating) >= star ? "#E11D48" : "none"} stroke={(hoverRating || rating) >= star ? "#E11D48" : "#4B5563"} strokeWidth="2" className="transition-colors duration-200 drop-shadow-md"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
         // --- MAIN APP ---
         const App = () => {
             const loadData = () => { const saved = localStorage.getItem("carbio_data"); return saved ? JSON.parse(saved) : []; };
@@ -1547,19 +1517,75 @@
             const [confirmModalConfig, setConfirmModalConfig] = React.useState({ isOpen: false, title: '', message: '', onConfirm: null, confirmText: '' });
 
             const [refreshCounter, setRefreshCounter] = React.useState(0);
-            const [isRefreshing, setIsRefreshing] = React.useState(false);
+            const [isFetchingDemo, setIsFetchingDemo] = React.useState(true);
 
-            const triggerRefresh = () => {
-                setIsRefreshing(true);
-                setTimeout(() => {
-                    setRefreshCounter(prev => prev + 1);
-                    setIsRefreshing(false);
-                }, 800);
-            };
+            // --- 🚀 AUTO FETCH DEMO EXCEL ON MOUNT 🚀 ---
+            React.useEffect(() => {
+                const fetchDemoFile = async () => {
+                    const filesToTry = ['./demo.xlsx', './demo.csv']; // Hem XLSX hem de CSV formatlarını dene
+                    
+                    for (const file of filesToTry) {
+                        try {
+                            const response = await fetch(file, { cache: 'no-store' });
+                            if (response.ok) {
+                                const arrayBuffer = await response.arrayBuffer();
+                                const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+                                const jd = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                                const validCars = jd.filter(r => r.Make);
+                                
+                                if (validCars.length > 0) {
+                                    setData(validCars);
+                                    setProfileName("Yigit"); // Defaulting name based on Excel
+                                    setIsFetchingDemo(false);
+                                    return; // Başarıyla yüklendiğinde alt taraftaki LocalStorage kontrolünü iptal et.
+                                }
+                            }
+                        } catch (error) {
+                            console.warn(`No local ${file} found or fetch failed. Checking local storage...`);
+                        }
+                    }
+                    
+                    // Sadece demo dosyaları bulunamazsa tarayıcı (local storage) verisini kullan.
+                    const saved = localStorage.getItem("carbio_data");
+                    if (saved) {
+                        try {
+                            const parsed = JSON.parse(saved);
+                            if (parsed && parsed.length > 0) {
+                                setData(parsed);
+                            }
+                        } catch(e) {}
+                    }
+                    setIsFetchingDemo(false);
+                };
 
-            const loadMyDemoData = () => {
-                setData(myDemoData);
-                setProfileName("Yiğit");
+                fetchDemoFile();
+            }, []);
+
+            // --- MANUAL REFRESH BUTTON (Forces fetch from demo files) ---
+            const triggerRefresh = async () => {
+                setIsFetchingDemo(true);
+                const filesToTry = ['./demo.xlsx', './demo.csv'];
+                
+                for (const file of filesToTry) {
+                    try {
+                        const response = await fetch(file, { cache: 'no-store' });
+                        if (response.ok) {
+                            const arrayBuffer = await response.arrayBuffer();
+                            const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+                            const jd = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                            const validCars = jd.filter(r => r.Make);
+                            
+                            if (validCars.length > 0) {
+                                setData(validCars);
+                                break;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn(`Sync failed for ${file}.`);
+                    }
+                }
+                setRefreshCounter(prev => prev + 1);
+                setIsFetchingDemo(false);
             };
 
             React.useEffect(() => { localStorage.setItem("carbio_data", JSON.stringify(data)); }, [data]);
@@ -1598,7 +1624,7 @@
                         onUpload={handleUpload} onAdd={() => setAddModalOpen(true)}
                         onShare={() => setShareOpen(true)} onReset={handleReset}
                         onVoteClick={() => setVoteModalOpen(true)}
-                        onRefreshClick={triggerRefresh} isRefreshing={isRefreshing}
+                        onRefreshClick={triggerRefresh} isRefreshing={isFetchingDemo}
                         onAnalyze={() => setAiAnalysisOpen(true)}
                         onExport={()=>{
                             const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
@@ -1607,11 +1633,17 @@
                     />
 
                     <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-8">
-                        {data.length > 0 ? (
+                        {isFetchingDemo ? (
+                            <div className="py-24 text-center flex flex-col items-center">
+                                <IconRefresh spinning={true} className="w-12 h-12 text-accent mb-4" />
+                                <h2 className="text-2xl font-display font-bold text-white mb-2">Loading your garage...</h2>
+                                <p className="text-gray-400">Fetching local data from the server</p>
+                            </div>
+                        ) : data.length > 0 ? (
                             <>
                                 <DeepInsights data={data} totalCO2={totalCO2} totalDistance={totalDistance} />
                                 <Timeline data={data} onCarClick={setSelectedCar} />
-                                <CollectionGrid data={data} onCarClick={setSelectedCar} countryInfo={c => baseCountryData[c] || {flag:'📍'}} />
+                                <CollectionGrid data={data} onCarClick={setSelectedCar} />
                             </>
                         ) : (
                             <div className="py-16 md:py-24 text-center flex flex-col items-center max-w-2xl mx-auto animate-fade-in">
@@ -1619,7 +1651,10 @@
                                     <IconMagic />
                                 </div>
                                 <h2 className="text-3xl font-display font-bold text-white mb-4">Welcome to your Carbiography</h2>
-                                <p className="text-gray-400 mb-8 leading-relaxed">Start building your automotive timeline. You can add cars manually or let our AI fetch the specs for you.</p>
+                                <p className="text-gray-400 mb-8 leading-relaxed">
+                                    If a <b>demo.xlsx</b> file is placed in your root directory, it will automatically load here.<br/>
+                                    Otherwise, you can start building your automotive timeline manually.
+                                </p>
 
                                 <div className="bg-dark border border-border rounded-2xl p-6 mb-8 text-left w-full">
                                     <h3 className="text-accent font-bold uppercase tracking-widest text-xs mb-4">How to add a car?</h3>
@@ -1639,15 +1674,9 @@
                                     </ul>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                                    <button onClick={() => setAddModalOpen(true)} className="bg-accent hover:bg-accentHover text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(225,29,72,0.4)] flex-1">
-                                        <IconPlus /> Add Your First Car
-                                    </button>
-                                    <button onClick={loadMyDemoData} className="bg-dark hover:bg-border text-white border border-border px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-lg flex-1 group">
-                                        <span className="text-purple-400 group-hover:scale-125 transition-transform"><IconMagic /></span> Try My Demo
-                                    </button>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-4">"Try My Demo" loads an extended sample garage based on an amazing collection of cars.</p>
+                                <button onClick={() => setAddModalOpen(true)} className="bg-accent hover:bg-accentHover text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(225,29,72,0.4)] w-full sm:w-auto">
+                                    <IconPlus /> Add Your First Car
+                                </button>
                             </div>
                         )}
                         
@@ -1661,7 +1690,7 @@
                         onClose={() => setSelectedCar(null)} 
                         onEdit={() => { setEditingCar(selectedCar); setSelectedCar(null); }}
                         onDelete={() => {
-                            openConfirm('Delete Car?', `Are you sure you want to permanently delete the ${selectedCar.Make} ${selectedCar.Model}?`, 'Yes, Delete', () => {
+                            openConfirm('Delete Car?', `Are you sure you want to permanently delete the ${selectedCar?.Make} ${selectedCar?.Model}?`, 'Yes, Delete', () => {
                                 setData(prev => prev.filter(c => c['#'] !== selectedCar['#']));
                                 setSelectedCar(null);
                                 closeConfirm();
