@@ -5,7 +5,7 @@
 ```{=html}
 <p align="center">
 ```
-`<img src="[https://raw.githubusercontent.com/placeholder/carbiography/main/assets/banner.png](https://github.com/yukselono/carbiography/blob/main/banner.png)" width="100%" alt="Carbiography Banner">`{=html}
+`<img src="(https://raw.githubusercontent.com/placeholder/carbiography/main/assets/banner.png)(https://github.com/yukselono/carbiography/blob/main/banner.png)" width="100%" alt="Carbiography Banner">`{=html}
 ```{=html}
 </p>
 ```
