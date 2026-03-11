@@ -43,6 +43,17 @@
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <!-- Firebase Import Map for Babel Modules -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"
+            }
+        }
+    </script>
+
     <style>
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0F0F0F; }
@@ -65,7 +76,18 @@
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
+    <script type="text/babel" data-type="module">
+        import { initializeApp } from 'firebase/app';
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+        import { getFirestore, collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
+
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
         // --- ICONS ---
         const IconUpload = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
         const IconDownload = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
@@ -73,7 +95,7 @@
         const IconPlus = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
         const IconX = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
         const IconTrash = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>;
-        const IconStar = ({ filled }) => <svg width="12" height="12" viewBox="0 0 24 24" fill={filled ? "#E11D48" : "none"} stroke={filled ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+        const IconStar = ({ filled, width=12, height=12 }) => <svg width={width} height={height} viewBox="0 0 24 24" fill={filled ? "#E11D48" : "none"} stroke={filled ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
         const IconMagic = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2.5 2v6h6M21.5 22v-6h-6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>;
         const IconEdit = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
         const IconGlobe = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
@@ -193,7 +215,7 @@
             document.body.removeChild(textArea);
         };
 
-        // --- GEMINI API INTEGRATION (ROBUST ERROR HANDLING) ---
+        // --- GEMINI API INTEGRATION ---
         const callGemini = async (prompt, systemPrompt = "You are an expert automotive critic and AI assistant.") => {
             const injectedKey = ""; 
             let activeApiKey = injectedKey;
@@ -673,7 +695,6 @@
                 try {
                     const targetYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
                     
-                    // --- ENHANCED AI PROMPT FOR DRIVING STORY ---
                     const prompt = `Write a passionate, thrilling, and highly personalized automotive magazine-style story (in English).
                     
                     About the car: ${targetYear} ${car.Make} ${car.Model} (${car.Power} HP, ${car.Engine}L ${car.Fuel}, ${car.Drive} ${car.Transmission}, ${car.Segment} segment).
@@ -1147,36 +1168,53 @@
             );
         };
 
-        const DailyVoteModal = ({ isOpen, onClose }) => {
-            const [rating, setRating] = React.useState(0);
+        // --- FIREBASE POWERED DAILY VOTE MODAL ---
+        const DailyVoteModal = ({ isOpen, onClose, user }) => {
             const [hoverRating, setHoverRating] = React.useState(0);
-            const [voted, setVoted] = React.useState(false);
             const [carImg, setCarImg] = React.useState('');
             
-            const todayStr = new Date().toISOString().split('T')[0];
+            // Firebase Verileri
+            const [allVotes, setAllVotes] = React.useState([]);
+
+            // Oylama Arabaları
+            const getCarForDate = (dateStr) => {
+                let hash = 0;
+                for (let i = 0; i < dateStr.length; i++) hash = dateStr.charCodeAt(i) + ((hash << 5) - hash);
+                return localCarDB[Math.abs(hash) % localCarDB.length];
+            };
+
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
             
-            let hash = 0;
-            for (let i = 0; i < todayStr.length; i++) hash = todayStr.charCodeAt(i) + ((hash << 5) - hash);
-            const carIndex = Math.abs(hash) % localCarDB.length;
-            const dailyCar = localCarDB[carIndex];
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
 
+            const dailyCar = getCarForDate(todayStr);
+            const yesterdayCar = getCarForDate(yesterdayStr);
+
+            // Fetch Global Votes from Firestore
             React.useEffect(() => {
-                const savedVote = localStorage.getItem(`carbio_daily_vote_${todayStr}`);
-                if (savedVote) {
-                    setRating(Number(savedVote));
-                    setVoted(true);
-                } else {
-                    setRating(0);
-                    setVoted(false);
-                }
-            }, [isOpen, todayStr]);
+                if (!user || !isOpen) return;
+                
+                // Firestore Referansı (Kural 1'e uygun)
+                const votesRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_votes');
+                
+                const unsubscribe = onSnapshot(votesRef, (snapshot) => {
+                    const votes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setAllVotes(votes);
+                }, (error) => {
+                    console.error("Firebase fetch error:", error);
+                });
 
+                return () => unsubscribe();
+            }, [user, isOpen]);
+
+            // Wiki Görseli
             React.useEffect(() => {
                 if (!isOpen || !dailyCar) return;
-                
                 setCarImg('');
                 const queryBrandModel = encodeURIComponent(`${dailyCar.Make} ${dailyCar.Model}`);
-                
                 fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${queryBrandModel}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=800&origin=*`)
                     .then(res => res.json())
                     .then(data => {
@@ -1187,15 +1225,38 @@
                     }).catch(() => {});
             }, [isOpen, dailyCar]);
 
-            if (!isOpen) return null;
+            // İstatistik Hesaplamaları
+            const todayVotes = allVotes.filter(v => v.date === todayStr);
+            const yesterdayVotes = allVotes.filter(v => v.date === yesterdayStr);
 
-            const handleVote = (val) => {
-                if (voted) return;
-                setRating(val);
-                setVoted(true);
-                localStorage.setItem(`carbio_daily_vote_${todayStr}`, val.toString());
+            const myTodayVote = todayVotes.find(v => v.userId === user?.uid)?.rating;
+            const myYesterdayVote = yesterdayVotes.find(v => v.userId === user?.uid)?.rating;
+
+            const todayAvg = todayVotes.length ? (todayVotes.reduce((s, v) => s + v.rating, 0) / todayVotes.length).toFixed(1) : "0.0";
+            const yesterdayAvg = yesterdayVotes.length ? (yesterdayVotes.reduce((s, v) => s + v.rating, 0) / yesterdayVotes.length).toFixed(1) : "0.0";
+
+            // Oy Gönderme İşlemi
+            const handleVote = async (val) => {
+                if (!user || myTodayVote) return;
+                setHoverRating(0);
+                
+                try {
+                    // Kullanıcının o günkü oyu için eşsiz ID
+                    const voteId = `${user.uid}_${todayStr}`;
+                    const voteRef = doc(db, 'artifacts', appId, 'public', 'data', 'daily_votes', voteId);
+                    
+                    await setDoc(voteRef, {
+                        userId: user.uid,
+                        date: todayStr,
+                        rating: val,
+                        timestamp: Date.now()
+                    });
+                } catch (error) {
+                    console.error("Oylama hatası:", error);
+                }
             };
 
+            if (!isOpen) return null;
             const fallbackImg = "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=800";
 
             return (
@@ -1205,11 +1266,18 @@
                         <div className="h-48 w-full relative bg-dark shrink-0">
                             <img src={carImg || fallbackImg} className="w-full h-full object-cover opacity-60 mix-blend-luminosity" />
                             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
+                            
+                            {/* CANLI BAĞLANTI İNDİKATÖRÜ */}
+                            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]"></span>
+                                <span className="text-[10px] text-white font-bold tracking-widest uppercase">Live</span>
+                            </div>
+
                             <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 bg-black/50 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
                         </div>
                         
-                        <div className="px-8 pb-8 relative -mt-8 z-10 flex-1 flex flex-col">
-                            <div className="w-16 h-16 bg-gradient-to-br from-accent to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg border-4 border-card relative z-20">
+                        <div className="px-8 pb-6 relative -mt-8 z-10 flex-1 flex flex-col overflow-y-auto">
+                            <div className="w-16 h-16 bg-gradient-to-br from-accent to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg border-4 border-card relative z-20 shrink-0">
                                 <IconVote />
                             </div>
                             
@@ -1223,21 +1291,29 @@
                                 <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Drive}</span>
                             </div>
 
-                            <div className="mt-auto">
-                                {voted ? (
-                                    <div className="animate-fade-in bg-green-500/10 border border-green-500/20 p-4 rounded-2xl">
+                            <div className="mb-8">
+                                {myTodayVote ? (
+                                    <div className="animate-fade-in bg-green-500/10 border border-green-500/20 p-5 rounded-2xl relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-4 text-5xl opacity-5">☁️</div>
                                         <p className="text-green-400 font-bold mb-3 text-sm">Thanks for voting today!</p>
-                                        <div className="flex justify-center gap-1">
+                                        
+                                        <div className="flex justify-center gap-1 mb-4">
                                             {[1, 2, 3, 4, 5].map((star) => (
-                                                <svg key={star} width="20" height="20" viewBox="0 0 24 24" fill={star <= rating ? "#E11D48" : "none"} stroke={star <= rating ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                                <svg key={star} width="20" height="20" viewBox="0 0 24 24" fill={star <= myTodayVote ? "#E11D48" : "none"} stroke={star <= myTodayVote ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                                             ))}
                                         </div>
-                                        <p className="text-[10px] text-gray-500 mt-3 uppercase tracking-widest">Come back tomorrow</p>
+
+                                        <div className="pt-3 border-t border-green-500/20 text-center">
+                                            <div className="text-[10px] text-green-500/80 uppercase tracking-widest font-bold mb-1">GLOBAL STATS</div>
+                                            <div className="text-xl text-white font-display font-bold flex items-center justify-center gap-2">
+                                                {todayAvg} ⭐️ <span className="text-sm font-normal text-gray-400">({todayVotes.length} votes)</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 ) : (
                                     <div>
                                         <p className="text-gray-300 mb-4 font-medium">Rate this car:</p>
-                                        <div className="flex justify-center gap-2">
+                                        <div className="flex justify-center gap-2 mb-4">
                                             {[1, 2, 3, 4, 5].map((star) => (
                                                 <button 
                                                     key={star} 
@@ -1246,13 +1322,50 @@
                                                     onClick={() => handleVote(star)}
                                                     className="transition-transform hover:scale-125 focus:outline-none"
                                                 >
-                                                    <svg width="36" height="36" viewBox="0 0 24 24" fill={(hoverRating || rating) >= star ? "#E11D48" : "none"} stroke={(hoverRating || rating) >= star ? "#E11D48" : "#4B5563"} strokeWidth="2" className="transition-colors duration-200 drop-shadow-md"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                                    <svg width="36" height="36" viewBox="0 0 24 24" fill={(hoverRating) >= star ? "#E11D48" : "none"} stroke={(hoverRating) >= star ? "#E11D48" : "#4B5563"} strokeWidth="2" className="transition-colors duration-200 drop-shadow-md"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                                                 </button>
                                             ))}
                                         </div>
+                                        
+                                        {todayVotes.length > 0 && (
+                                            <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-2">
+                                                Global Avg so far: <span className="text-accent font-bold">{todayAvg}</span>
+                                            </p>
+                                        )}
                                     </div>
                                 )}
                             </div>
+
+                            {/* YESTERDAY'S CAR SECTION (CLOUD POWERED) */}
+                            <div className="mt-auto border-t border-border pt-5 text-left flex-shrink-0">
+                                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Yesterday's Car</div>
+                                <div className="flex flex-col gap-3 bg-dark border border-border/50 rounded-xl p-3 shadow-inner">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="text-sm font-bold text-white mb-0.5">{yesterdayCar.Make} {yesterdayCar.Model}</div>
+                                            <div className="text-[10px] text-gray-400 uppercase tracking-wider">{yesterdayCar.Segment} • {yesterdayCar.Power} HP</div>
+                                        </div>
+                                        <div className="bg-card px-3 py-1.5 rounded-lg border border-border/50 flex flex-col items-end">
+                                            <span className="text-[9px] text-gray-500 mb-1 uppercase tracking-widest">Your Vote</span>
+                                            {myYesterdayVote ? (
+                                                <div className="flex gap-0.5">
+                                                    {[1,2,3,4,5].map(s => <IconStar key={s} filled={s <= myYesterdayVote} width="10" height="10" />)}
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-gray-600 italic font-medium">Missed</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                                        <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">Global Rating</span>
+                                        <span className="text-xs font-bold text-white bg-card px-2 py-0.5 rounded border border-border">
+                                            {yesterdayAvg} ⭐️ <span className="font-normal text-gray-500 ml-1">({yesterdayVotes.length})</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -1519,6 +1632,30 @@
             const [refreshCounter, setRefreshCounter] = React.useState(0);
             const [isFetchingDemo, setIsFetchingDemo] = React.useState(true);
 
+            // --- FIREBASE USER STATE ---
+            const [user, setUser] = React.useState(null);
+
+            // --- INIT FIREBASE AUTH ---
+            React.useEffect(() => {
+                const initAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Firebase Auth Hatası:", error);
+                    }
+                };
+                initAuth();
+
+                const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                    setUser(currentUser);
+                });
+                return () => unsubscribe();
+            }, []);
+
             // --- 🚀 AUTO FETCH DEMO EXCEL ON MOUNT 🚀 ---
             React.useEffect(() => {
                 const fetchDemoFile = async () => {
@@ -1714,7 +1851,7 @@
                         existingData={data} 
                     />
                     
-                    <DailyVoteModal isOpen={voteModalOpen} onClose={() => setVoteModalOpen(false)} />
+                    <DailyVoteModal isOpen={voteModalOpen} onClose={() => setVoteModalOpen(false)} user={user} />
                     
                     <PromptModal isOpen={nameModalOpen} title="Profile Name" desc="Enter a name to display on your dashboard and share cards." defaultValue={profileName} onClose={()=>setNameModalOpen(false)} onSave={setProfileName} />
                     
