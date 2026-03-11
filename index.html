@@ -82,10 +82,32 @@
         import { getFirestore, collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 
         // --- FIREBASE INITIALIZATION ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app, auth, db;
+        let isFirebaseEnabled = false;
+        try {
+            // BURAYA KENDİ FIREBASE AYARLARINIZI GİREBİLİRSİNİZ (GitHub Pages için)
+            const fallbackConfig = {
+                // apiKey: "AIzaSy...",
+                // authDomain: "proje-id.firebaseapp.com",
+                // projectId: "proje-id",
+                // storageBucket: "proje-id.appspot.com",
+                // messagingSenderId: "123456789",
+                // appId: "1:123456789:web:abcdef"
+            };
+            
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : fallbackConfig;
+            
+            if (Object.keys(firebaseConfig).length > 0) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                isFirebaseEnabled = true;
+            } else {
+                console.warn("Firebase ayarları bulunamadı. Oylama özellikleri devre dışı bırakıldı.");
+            }
+        } catch (e) {
+            console.error("Firebase başlatılamadı:", e);
+        }
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // --- ICONS ---
@@ -1195,7 +1217,7 @@
 
             // Fetch Global Votes from Firestore
             React.useEffect(() => {
-                if (!user || !isOpen) return;
+                if (!user || !isOpen || !isFirebaseEnabled || !db) return;
                 
                 // Firestore Referansı (Kural 1'e uygun)
                 const votesRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_votes');
@@ -1237,7 +1259,7 @@
 
             // Oy Gönderme İşlemi
             const handleVote = async (val) => {
-                if (!user || myTodayVote) return;
+                if (!user || myTodayVote || !isFirebaseEnabled || !db) return;
                 setHoverRating(0);
                 
                 try {
@@ -1285,6 +1307,12 @@
                             <h2 className="text-3xl font-display font-bold text-white mb-1">{dailyCar.Make}</h2>
                             <h3 className="text-xl font-light text-gray-300 mb-6">{dailyCar.Model} <span className="text-accent font-bold">({dailyCar.Power} HP)</span></h3>
                             
+                            {!isFirebaseEnabled && (
+                                <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-6 text-sm text-red-400 text-left">
+                                    ⚠️ <b>Sistem Çevrimdışı:</b> Kodda Firebase ayarları girilmediği için bulut oylama özelliği şu an kullanılamıyor.
+                                </div>
+                            )}
+
                             <div className="bg-dark border border-border rounded-xl p-3 mb-8 text-sm text-gray-400 flex justify-center gap-3 mx-auto flex-wrap w-full">
                                 <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Engine > 0 ? `${dailyCar.Engine}L ` : ''}{dailyCar.Fuel}</span>
                                 <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Transmission}</span>
@@ -1638,6 +1666,7 @@
             // --- INIT FIREBASE AUTH ---
             React.useEffect(() => {
                 const initAuth = async () => {
+                    if (!isFirebaseEnabled || !auth) return;
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                             await signInWithCustomToken(auth, __initial_auth_token);
@@ -1650,10 +1679,12 @@
                 };
                 initAuth();
 
-                const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-                    setUser(currentUser);
-                });
-                return () => unsubscribe();
+                if (isFirebaseEnabled && auth) {
+                    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                        setUser(currentUser);
+                    });
+                    return () => unsubscribe();
+                }
             }, []);
 
             // --- 🚀 AUTO FETCH DEMO EXCEL ON MOUNT 🚀 ---
