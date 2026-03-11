@@ -1,7 +1,9 @@
 # 🚗 Carbiography
 
 ### Your Personal Automotive Timeline
-
+<p align="center">
+  <img src="/banner.png" alt="Carbiography Banner">
+</p>
 ```{=html}
 <p align="center">
 ```
