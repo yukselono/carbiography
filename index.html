@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -59,6 +59,7 @@
         select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -194,7 +195,7 @@
 
         // --- GEMINI API INTEGRATION (ROBUST ERROR HANDLING) ---
         const callGemini = async (prompt, systemPrompt = "You are an expert automotive critic and AI assistant.") => {
-            const injectedKey = "AIzaSyBpNn8zotNo11CaO-Xv7Ypf8R5F7eaGMI8"; 
+            const injectedKey = ""; 
             let activeApiKey = injectedKey;
 
             if (!activeApiKey || activeApiKey === "") {
@@ -210,7 +211,6 @@
                 }
             }
 
-            // MİMARİ NOT: Model adı gemini-1.5-flash olarak güncellendi. Açık (Public) API üzerinden en stabil model budur.
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeApiKey}`;
             
             const payload = {
@@ -322,7 +322,7 @@
         };
 
         // 1. Hero Section
-        const HeroSection = ({ profileName, onEditProfile, data, totalCars, onShare, onUpload, onExport, onAdd, onReset, onVoteClick, onRefreshClick, isRefreshing, onAnalyze }) => {
+        const HeroSection = ({ profileName, onEditProfile, data, totalCars, onShare, onUpload, onExport, onAdd, onReset, onVoteClick, onRefreshClick, isRefreshing }) => {
             const bgImages = [
                 "https://images.pexels.com/photos/3752194/pexels-photo-3752194.jpeg?auto=compress&cs=tinysrgb&w=1920",
                 "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=1920",
@@ -402,11 +402,6 @@
                             {totalCars > 0 && (
                                 <button onClick={onExport} className="bg-card hover:bg-border text-white text-sm px-4 py-2.5 rounded-full border border-border transition flex items-center gap-2 font-medium hidden sm:flex">
                                     <IconDownload /> JSON
-                                </button>
-                            )}
-                            {totalCars > 0 && (
-                                <button onClick={onAnalyze} className="bg-gradient-to-r from-purple-600/20 to-accent/20 hover:from-purple-600 hover:to-accent text-white text-sm px-5 py-2.5 rounded-full border border-purple-500/30 transition flex items-center gap-2 font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                                    ✨ AI Analysis
                                 </button>
                             )}
                             {totalCars > 0 && (
@@ -543,7 +538,7 @@
                                                         <div className="font-bold text-base text-white leading-tight truncate">{car.Make} {car.Model}</div>
                                                         <div className="text-[9px] text-gray-500 uppercase tracking-widest shrink-0 ml-2 bg-dark px-2 py-1 rounded">{car.Status}</div>
                                                     </div>
-                                                    {car.Story && <div className="text-xs text-gray-400 italic truncate mb-2">"{car.Story}"</div>}
+                                                    {car.Story && <div className="text-xs text-gray-400 italic line-clamp-2 mb-2 border-l-2 border-border pl-2">"{car.Story}"</div>}
                                                     <div className="flex justify-between items-center mt-2 border-t border-border pt-2">
                                                         <div className="text-xs text-gray-400 font-medium">{modelYear} model • {car.Power} hp</div>
                                                         <CarRating points={car.Points} />
@@ -613,9 +608,14 @@
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-bold text-lg text-white mb-1 truncate">{car.Make} {car.Model}</h4>
-                                                <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
+                                                <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
                                                     <span className="bg-dark px-2 py-0.5 rounded text-white border border-border">{modelYear}</span> • <span>{car.Power} hp</span>
                                                 </div>
+                                                {car.Story && (
+                                                    <div className="mt-2 mb-2 text-xs text-gray-400 italic line-clamp-2 border-l-2 border-accent/50 pl-2">
+                                                        "{car.Story}"
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="pt-3 border-t border-border flex justify-between items-center mt-auto">
                                                 <CarRating points={car.Points} />
@@ -690,7 +690,7 @@
                     const response = await callGemini(prompt, "You are a world-renowned automotive journalist and storyteller like Jeremy Clarkson. You turn simple car specs and memories into epic literature.");
                     setAiStory(response);
                 } catch (error) {
-                    setAiStory(`An error occurred while generating the story:\n${error.message}`);
+                    setAiStory(`An error occurred while generating the review:\n${error.message}`);
                 } finally {
                     setIsGeneratingStory(false);
                 }
@@ -708,6 +708,9 @@
             const cultureData = getCarCultureData(car.Make, car.Model, car.Power, car.Segment);
             
             const generatedReview = `The ${targetYear} ${car.Make} ${car.Model} offers a compelling driving experience. With its ${car.Engine}L engine delivering ${car.Power} horsepower, it stands out in the ${car.Segment || 'automotive'} segment. The ${String(car.Drive).toUpperCase() || 'standard'} drivetrain ensures solid handling. You drove this car in ${car['Driving Year'] || 'the past'} across a ${Number(car['Mileage (est)']).toLocaleString()} km journey.`;
+
+            // Display Fallback Story if the user hasn't added one manually
+            const displayStory = car.Story || `A memorable drive with the ${car.Make} ${car.Model}. The ${car.Engine}L engine and ${car.Power} HP provided a truly distinct experience on the roads of ${car.Country || 'the world'}.`;
 
             return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-md" onClick={onClose}>
@@ -741,6 +744,18 @@
                         </div>
 
                         <div className="p-6 md:p-8 overflow-y-auto">
+
+                            {/* PROMINENT STORY / NOTE BLOCK */}
+                            <div className="mb-8 relative bg-gradient-to-r from-accent/10 to-transparent border-l-4 border-accent p-6 rounded-r-2xl">
+                                <div className="absolute -top-4 -left-2 text-6xl text-accent/20 font-display font-black">"</div>
+                                <p className="text-xl md:text-2xl text-white font-light italic relative z-10 leading-relaxed">
+                                    {displayStory}
+                                </p>
+                                <div className="mt-3 flex items-center gap-2">
+                                    <div className="w-6 h-px bg-accent"></div>
+                                    <div className="text-xs text-accent font-bold uppercase tracking-widest">Driver's Note</div>
+                                </div>
+                            </div>
 
                             {/* Automotive Data Grid */}
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 mb-8">
@@ -809,13 +824,13 @@
                                 </div>
                             </div>
 
-                            {/* My Driving Story & Action Video */}
+                            {/* AI Review & Action Video */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
-                                        <h4 className="font-display font-bold text-lg text-white">My Driving Story</h4>
+                                        <h4 className="font-display font-bold text-lg text-white">AI Automotive Review</h4>
                                         <button onClick={generateAiStory} disabled={isGeneratingStory} className="text-[10px] bg-accent/20 hover:bg-accent text-accent hover:text-white px-3 py-1.5 rounded transition flex items-center gap-1 font-bold border border-accent/30">
-                                            {isGeneratingStory ? '✨ Revving Engine...' : '✨ Write AI Story'}
+                                            {isGeneratingStory ? '✨ Revving Engine...' : '✨ Generate AI Article'}
                                         </button>
                                     </div>
                                     <div className="bg-dark p-5 rounded-xl border border-border h-full flex flex-col gap-5 relative overflow-hidden group">
@@ -828,13 +843,7 @@
                                             </div>
                                         )}
 
-                                        {car.Story && (
-                                            <div className="border-l-2 border-accent pl-4 relative">
-                                                <div className="absolute -top-3 -left-2 text-4xl text-accent/20 font-display">"</div>
-                                                <p className="text-gray-200 italic text-sm leading-relaxed relative z-10">{car.Story}</p>
-                                            </div>
-                                        )}
-                                        <div className={`${car.Story ? 'pt-4 border-t border-border' : ''} flex-1 pb-4 relative`}>
+                                        <div className="flex-1 pb-4 relative">
                                             <p className="text-sm text-gray-400 leading-relaxed whitespace-pre-line">
                                                 {aiStory || generatedReview}
                                             </p>
@@ -1022,7 +1031,17 @@
                 }
                 
                 if (match) {
-                    setForm(prev => ({ ...prev, Power: match.Power || prev.Power, Engine: match.Engine || prev.Engine, Fuel: match.Fuel || prev.Fuel, Transmission: match.Transmission || prev.Transmission, Drive: match.Drive || prev.Drive, Segment: match.Segment || prev.Segment }));
+                    setForm(prev => ({ 
+                        ...prev, 
+                        Power: match.Power || prev.Power, 
+                        Engine: match.Engine || prev.Engine, 
+                        Fuel: match.Fuel || prev.Fuel, 
+                        Transmission: match.Transmission || prev.Transmission, 
+                        Drive: match.Drive || prev.Drive, 
+                        Segment: match.Segment || prev.Segment,
+                        // Eğer boşsa şık bir Driver's Note ekle
+                        Story: prev.Story || `A memorable journey behind the wheel of the ${match.Make} ${match.Model}.`
+                    }));
                     setAutoFillStatus('success');
                 } else setAutoFillStatus('error');
                 
@@ -1042,7 +1061,7 @@
                                 <div>
                                     <div className="text-sm text-white font-bold flex items-center gap-2"><IconMagic /> Smart Auto-Fill</div>
                                     <div className="text-xs text-gray-400 mt-1">Enter Make & Model to fetch technical specs automatically.</div>
-                                    {autoFillStatus === 'success' && <div className="text-xs text-green-400 mt-1 font-medium">✨ Specs loaded!</div>}
+                                    {autoFillStatus === 'success' && <div className="text-xs text-green-400 mt-1 font-medium">✨ Specs & Auto Note loaded!</div>}
                                 </div>
                                 <button type="button" onClick={handleAutoFill} disabled={!form.Make || !form.Model || isAutoFilling} className={`w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2 shrink-0 ${(!form.Make || !form.Model) ? 'bg-dark text-gray-600' : 'bg-accent/20 text-accent hover:bg-accent hover:text-white'}`}>
                                     {isAutoFilling ? 'Searching...' : 'Fetch Specs'}
@@ -1053,7 +1072,7 @@
                                 <div><label className="text-xs text-gray-500 uppercase mb-1 block">Make*</label><input required name="Make" onChange={handleChange} value={form.Make} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="BMW" /></div>
                                 <div><label className="text-xs text-gray-500 uppercase mb-1 block">Model*</label><input required name="Model" onChange={handleChange} value={form.Model} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="M3" /></div>
                                 
-                                <div className="col-span-2"><label className="text-xs text-gray-500 uppercase mb-1 block">Personal Story / Note</label><textarea name="Story" onChange={handleChange} value={form.Story} rows="2" className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="First time driving a V8..."></textarea></div>
+                                <div className="col-span-2"><label className="text-xs text-gray-500 uppercase mb-1 block flex justify-between"><span>Personal Story / Driver's Note</span> <span className="text-[9px] text-accent">Featured in detail view</span></label><textarea name="Story" onChange={handleChange} value={form.Story} rows="2" className="w-full bg-dark border border-accent/50 rounded-lg p-3 text-sm text-white focus:border-accent outline-none shadow-[0_0_15px_rgba(225,29,72,0.1)]" placeholder="First time driving a V8..."></textarea></div>
 
                                 <div><label className="text-xs text-gray-500 uppercase mb-1 block">Model Year</label><input type="number" name="Model Year" onChange={handleChange} value={form['Model Year']} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="e.g. 1990" /></div>
                                 <div><label className="text-xs text-gray-500 uppercase mb-1 block">Driving Year(s)</label><input type="text" name="Driving Year" onChange={handleChange} value={form['Driving Year']} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="e.g. 2015-2020" /></div>
@@ -1234,68 +1253,6 @@
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // --- AI Garage Analysis Modal ---
-        const AIGarageAnalysisModal = ({ isOpen, onClose, data }) => {
-            const [analysis, setAnalysis] = React.useState('');
-            const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-
-            React.useEffect(() => {
-                if (isOpen && data.length > 0 && !analysis) {
-                    runAnalysis();
-                }
-            }, [isOpen, data]);
-
-            const runAnalysis = async () => {
-                setIsAnalyzing(true);
-                try {
-                    const carList = data.map(c => `${c.Make} ${c.Model} (${c.Segment}, ${c.Power}HP)`).join(", ");
-                    const prompt = `Here is the list of cars I've driven: ${carList}. As an automotive psychologist, please analyze my garage. Explain what kind of driver I am in a fun, professional, and slightly humorous tone (in English). Give me a cool "Driver Title" (e.g. "Lover of German Engineering" or "Performance Maniac"). Keep it to 2 or 3 paragraphs. Do NOT use markdown symbols like * or # in the output, provide clean text.`;
-                    
-                    const response = await callGemini(prompt, "You are an expert automotive profile analyst and psychologist. You look at a user's car history and provide a cool analysis.");
-                    setAnalysis(response);
-                } catch (error) {
-                    setAnalysis(`An unexpected error occurred during analysis:\n${error.message}`);
-                } finally {
-                    setIsAnalyzing(false);
-                }
-            };
-
-            if (!isOpen) return null;
-
-            return (
-                <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={onClose}>
-                    <div className="bg-gradient-to-br from-card to-dark w-full max-w-2xl rounded-3xl border border-purple-500/30 p-8 shadow-[0_0_50px_rgba(168,85,247,0.15)] relative" onClick={e=>e.stopPropagation()}>
-                        <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 bg-black/30 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
-                        <h3 className="font-display font-bold text-3xl text-white mb-2 flex items-center gap-3">
-                            <span className="text-purple-400">✨</span> AI Garage Analysis
-                        </h3>
-                        <p className="text-gray-400 text-sm mb-6">Gemini AI is analyzing your driving history and automotive taste...</p>
-                        
-                        <div className="bg-dark/80 border border-border rounded-2xl p-6 min-h-[200px] flex flex-col justify-center shadow-inner relative overflow-hidden">
-                            <div className="absolute -bottom-10 -right-10 text-9xl opacity-5 pointer-events-none">🧠</div>
-                            {isAnalyzing ? (
-                                <div className="text-center animate-pulse">
-                                    <div className="text-5xl mb-4">🔮</div>
-                                    <div className="text-purple-400 font-bold tracking-widest uppercase text-sm">Analyzing your profile...</div>
-                                    <div className="text-xs text-gray-500 mt-2">Connecting to API, this may take a few seconds.</div>
-                                </div>
-                            ) : (
-                                <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line relative z-10">
-                                    {analysis}
-                                </div>
-                            )}
-                        </div>
-                        
-                        <div className="mt-6 flex justify-end">
-                            <button onClick={onClose} className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-full font-bold transition shadow-[0_0_15px_rgba(147,51,234,0.4)]">
-                                Done
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -1557,7 +1514,6 @@
             const [addModalOpen, setAddModalOpen] = React.useState(false);
             const [nameModalOpen, setNameModalOpen] = React.useState(false);
             const [voteModalOpen, setVoteModalOpen] = React.useState(false);
-            const [aiAnalysisOpen, setAiAnalysisOpen] = React.useState(false);
             const [confirmModalConfig, setConfirmModalConfig] = React.useState({ isOpen: false, title: '', message: '', onConfirm: null, confirmText: '' });
 
             const [refreshCounter, setRefreshCounter] = React.useState(0);
@@ -1566,7 +1522,7 @@
             // --- 🚀 AUTO FETCH DEMO EXCEL ON MOUNT 🚀 ---
             React.useEffect(() => {
                 const fetchDemoFile = async () => {
-                    const filesToTry = ['./demo.xlsx', './demo.csv']; // Hem XLSX hem de CSV formatlarını dene
+                    const filesToTry = ['./demo.xlsx', './demo.csv']; 
                     
                     for (const file of filesToTry) {
                         try {
@@ -1579,9 +1535,9 @@
                                 
                                 if (validCars.length > 0) {
                                     setData(validCars);
-                                    setProfileName("Yigit"); // Defaulting name based on Excel
+                                    setProfileName("Yigit"); 
                                     setIsFetchingDemo(false);
-                                    return; // Başarıyla yüklendiğinde alt taraftaki LocalStorage kontrolünü iptal et.
+                                    return; 
                                 }
                             }
                         } catch (error) {
@@ -1589,7 +1545,6 @@
                         }
                     }
                     
-                    // Sadece demo dosyaları bulunamazsa tarayıcı (local storage) verisini kullan.
                     const saved = localStorage.getItem("carbio_data");
                     if (saved) {
                         try {
@@ -1605,7 +1560,7 @@
                 fetchDemoFile();
             }, []);
 
-            // --- MANUAL REFRESH BUTTON (Forces fetch from demo files) ---
+            // --- MANUAL REFRESH BUTTON ---
             const triggerRefresh = async () => {
                 setIsFetchingDemo(true);
                 const filesToTry = ['./demo.xlsx', './demo.csv'];
@@ -1669,7 +1624,6 @@
                         onShare={() => setShareOpen(true)} onReset={handleReset}
                         onVoteClick={() => setVoteModalOpen(true)}
                         onRefreshClick={triggerRefresh} isRefreshing={isFetchingDemo}
-                        onAnalyze={() => setAiAnalysisOpen(true)}
                         onExport={()=>{
                             const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
                             a.download = "Carbiography.json"; document.body.appendChild(a); a.click(); a.remove();
@@ -1773,17 +1727,11 @@
                         onConfirm={confirmModalConfig.onConfirm} 
                     />
 
-                    <AIGarageAnalysisModal 
-                        isOpen={aiAnalysisOpen} 
-                        onClose={() => setAiAnalysisOpen(false)} 
-                        data={data} 
-                    />
-
                     <footer className="max-w-7xl mx-auto px-4 sm:px-8 mt-16 pt-8 pb-12 border-t border-border text-center">
                         <p className="text-gray-500 text-sm font-medium">
                             Developed by <a href="https://www.linkedin.com/in/yigityuksel/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-accent transition-colors underline decoration-border hover:decoration-accent underline-offset-4 font-bold">Yigit Yuksel</a>
                         </p>
-                        <a href="mailto:carbiography@gmail.com" className="text-gray-400 hover:text-accent transition-colors text-xs mt-2 inline-block">carbiography@gmail.com</a>
+                        <a href="mailto:carbiography@gmail.com" className="text-gray-400 hover:text-accent transition-colors text-xs mt-2 inline-block">yuksel.ono@gmail.com</a>
                     </footer>
                 </div>
             );
