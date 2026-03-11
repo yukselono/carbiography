@@ -43,9 +43,6 @@
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Recharts -->
-    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
-    <script src="https://unpkg.com/recharts@1.8.5/umd/Recharts.min.js"></script>
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -59,8 +56,6 @@
         .timeline-scroll { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         .timeline-item { scroll-snap-align: start; }
         .timeline-line { position: absolute; top: 24px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #E11D48 0%, #2A2A2A 100%); z-index: 0; }
-        .leaflet-container { background: #0F0F0F !important; font-family: 'Inter', sans-serif; }
-        .leaflet-bar a { background-color: #1A1A1A !important; color: #fff !important; border-color: #2A2A2A !important; }
         @keyframes pulse-accent {
             0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
             70% { transform: scale(1.2); box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); }
@@ -72,7 +67,6 @@
         }
         .animate-marquee { animation: marquee 35s linear infinite; }
         .animate-marquee:hover { animation-play-state: paused; }
-        .map-pin { width: 14px; height: 14px; background-color: #E11D48; border-radius: 50%; animation: pulse-accent 2s infinite; border: 2px solid #fff; }
         select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -93,18 +87,15 @@
         const IconMagic = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2.5 2v6h6M21.5 22v-6h-6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>;
         const IconEdit = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
         const IconGlobe = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
-
         const IconTwitter = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>;
         const IconLinkedIn = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>;
         const IconFacebook = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>;
         const IconCoffee = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>;
         const IconTrending = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>;
         const IconCalendar = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>;
-        const IconExternalLink = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>;
         const IconLocation = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
         const IconTicket = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 12h20M7 5v14M17 5v14"></path></svg>;
         const IconGamepad = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><path d="M22 12a10 10 0 0 0-20 0v2a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5v-2z"></path></svg>;
-        const IconPlay = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
         const IconVote = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>;
         const IconRefresh = ({ spinning }) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={spinning ? "animate-spin" : ""}><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>;
 
@@ -115,42 +106,37 @@
             { Make: 'BMW', Model: 'M3', MinYear: 1986, MaxYear: 1991, Power: 200, Engine: 2.3, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
             { Make: 'BMW', Model: 'M3', MinYear: 1992, MaxYear: 1999, Power: 286, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
             { Make: 'BMW', Model: 'M3', MinYear: 2000, MaxYear: 2006, Power: 343, Engine: 3.2, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'BMW', Model: 'M3', MinYear: 2007, MaxYear: 2013, Power: 420, Engine: 4.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'BMW', Model: 'M3', MinYear: 2014, MaxYear: 2019, Power: 431, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'BMW', Model: 'M3', MinYear: 2020, MaxYear: 2030, Power: 510, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
             { Make: 'Audi', Model: 'A3', Power: 150, Engine: 1.4, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Audi', Model: 'A4', Power: 150, Engine: 1.4, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Luxury' },
             { Make: 'Audi', Model: 'S3', Power: 300, Engine: 2.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
             { Make: 'Mercedes', Model: 'C200', Power: 184, Engine: 1.5, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
             { Make: 'Tesla', Model: 'Model 3', Power: 283, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
-            { Make: 'Tesla', Model: 'Model S', Power: 670, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Luxury' },
             { Make: 'Volkswagen', Model: 'Golf', Power: 110, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Volkswagen', Model: 'Polo', Power: 95, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Volkswagen', Model: 'Passat', Power: 150, Engine: 1.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
-            { Make: 'Volkswagen', Model: 'Tiguan', Power: 150, Engine: 1.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
-            { Make: 'Ford', Model: 'Focus', Power: 125, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
             { Make: 'Ford', Model: 'Mustang', Power: 450, Engine: 5.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'Renault', Model: 'Clio', Power: 90, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Renault', Model: 'Megane', Power: 115, Engine: 1.5, Fuel: 'Diesel', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
             { Make: 'Toyota', Model: 'Corolla', Power: 122, Engine: 1.8, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Toyota', Model: 'Yaris', Power: 116, Engine: 1.5, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Nissan', Model: 'Qashqai', Power: 158, Engine: 1.3, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
-            { Make: 'Hyundai', Model: 'Tucson', Power: 150, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
-            { Make: 'Kia', Model: 'Sportage', Power: 150, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
-            { Make: 'Dacia', Model: 'Duster', Power: 115, Engine: 1.5, Fuel: 'Diesel', Transmission: 'Manual', Drive: 'AWD', Segment: 'Economy' },
-            { Make: 'Opel', Model: 'Corsa', Power: 100, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Opel', Model: 'Astra', Power: 130, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
-            { Make: 'Peugeot', Model: '208', Power: 100, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
-            { Make: 'Peugeot', Model: '3008', Power: 130, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
             { Make: 'Volvo', Model: 'XC40', Power: 252, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Luxury' },
-            { Make: 'Honda', Model: 'Civic', Power: 125, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
             { Make: 'Aston Martin', Model: 'Vantage', Power: 503, Engine: 4.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
             { Make: 'Porsche', Model: '911', Power: 450, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
             { Make: 'Ferrari', Model: '458', Power: 570, Engine: 4.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'Audi', Model: 'R8', Power: 610, Engine: 5.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Supercar' },
-            { Make: 'Nissan', Model: 'GT-R', Power: 565, Engine: 3.8, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Supercar' },
-            { Make: 'Lamborghini', Model: 'Huracan', Power: 610, Engine: 5.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Supercar' },
             { Make: 'Bugatti', Model: 'Veyron', Power: 1001, Engine: 8.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Hypercar' }
+        ];
+
+        // --- YIGIT'S DEMO CAR DATA (FROM PROVIDED CARBIOGRAPHY.MD / CSV) ---
+        const myDemoData = [
+            { "#": 1, Make: "Ferrari", Model: "GTC4Lusso", "Driving Year": "2023", Power: 690, Engine: 6.3, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Supercar", Country: "Italy", Points: 9, Status: "Rental", "Mileage (est)": 800, Story: "İnanılmaz bir V12 senfonisi, İtalya yollarında unutulmaz bir deneyim." },
+            { "#": 2, Make: "Aston Martin", Model: "DB9", "Driving Year": "2015", Power: 547, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "İsveç'te buz üzerinde bir İngiliz asilzadesi." },
+            { "#": 3, Make: "Aston Martin", Model: "Vanquish", "Driving Year": "2015", Power: 577, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100 },
+            { "#": 4, Make: "Audi", Model: "S3", "Driving Year": "2017-2023", Power: 300, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Performance", Country: "Turkey", Points: 10, Status: "Owned", "Mileage (est)": 65000, Story: "Yıllarca kahrımı çeken, her yola gelen performans canavarı yol arkadaşım." },
+            { "#": 5, Make: "BYD", Model: "Seal", "Driving Year": "2025", Power: 231, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "RWD", Segment: "Sedan", Country: "Turkey", Points: 10, Status: "Owned", "Mileage (est)": 15000, Story: "Elektrik devrimine geçiş yaptığım mükemmel menzilli araç." },
+            { "#": 6, Make: "Volvo", Model: "XC40", "Driving Year": "2024", Power: 252, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Leasing", "Mileage (est)": 12000 },
+            { "#": 7, Make: "Ferrari", Model: "458 Spider", "Driving Year": "2014", Power: 570, Engine: 4.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Supercar", Country: "Italy", Points: 10, Status: "Rental", "Mileage (est)": 400, Story: "Üstü açık, atmosferik V8... Rüya gibi." },
+            { "#": 8, Make: "Toyota", Model: "RAV4", "Driving Year": "2023", Power: 306, Engine: 2.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 9, Status: "Rental", "Mileage (est)": 2500, Story: "Norveç'in zorlu kış şartlarında hiç üzmedi." },
+            { "#": 9, Make: "BMW", Model: "X1", "Driving Year": "2025", Power: 245, Engine: 1.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 8, Status: "Rental", "Mileage (est)": 1800 },
+            { "#": 10, Make: "Mercedes", Model: "S-class", "Driving Year": "2010", Power: 517, Engine: 5.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Test", "Mileage (est)": 50 },
+            { "#": 11, Make: "Ford", Model: "Fiesta", "Driving Year": "2016", Power: 200, Engine: 1.6, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 8, Status: "Test", "Mileage (est)": 300, Story: "Autobahn'da küçük ama inanılmaz keyifli bir hot hatch." },
+            { "#": 12, Make: "KGM", Model: "Torres EVX", "Driving Year": "2025", Power: 207, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "FWD", Segment: "SUV", Country: "Turkey", Points: 7, Status: "Friend", "Mileage (est)": 200 },
+            { "#": 13, Make: "Fiat", Model: "500", "Driving Year": "2018", Power: 69, Engine: 1.2, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 5, Status: "Rental", "Mileage (est)": 500 },
+            { "#": 14, Make: "Volvo", Model: "S60", "Driving Year": "2025", Power: 310, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Sedan", Country: "USA", Points: 7, Status: "Friend", "Mileage (est)": 600, Story: "Amerika'nın uzun otoyollarında konforlu sürüş." },
+            { "#": 15, Make: "Alfa Romeo", Model: "Giulietta", "Driving Year": "2012", Power: 170, Engine: 1.4, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 6, Status: "Test", "Mileage (est)": 10 }
         ];
 
         // --- AUTOMOTIVE CULTURAL INTELLIGENCE (GAMES, MOVIES, RARITY) ---
@@ -228,7 +214,7 @@
             };
         };
 
-        // --- GEMINI API INTEGRATION ---
+        // --- GEMINI API INTEGRATION (ROBUST ERROR HANDLING) ---
         const callGemini = async (prompt, systemPrompt = "Sen uzman bir otomobil eleştirmeni ve yapay zeka asistanısın.") => {
             const apiKey = "";
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
@@ -238,19 +224,24 @@
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
 
-            const delays = [1000, 2000, 4000, 8000, 16000];
-            for (let i = 0; i < delays.length + 1; i++) {
+            const delays = [1000, 2000, 4000]; // Reduced delays so it fails faster if API key is empty/invalid
+            for (let i = 0; i <= delays.length; i++) {
                 try {
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Görünüşe göre yapay zeka şu an meşgul. Daha sonra tekrar deneyin.";
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error?.message || `API Hatası (${response.status})`);
+                    }
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Görünüşe göre yapay zeka şu an cevap veremiyor.";
                 } catch (error) {
-                    if (i === delays.length) return "Yapay zeka servisine bağlanılamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.";
+                    if (i === delays.length) {
+                        return `Yapay zeka servisine bağlanılamadı. Hata: ${error.message}. Lütfen daha sonra tekrar deneyin.`;
+                    }
                     await new Promise(res => setTimeout(res, delays[i]));
                 }
             }
@@ -283,7 +274,7 @@
             let badges = [];
             if(data.some(c => Number(c.Power) >= 400)) badges.push({icon: '🏎️', title: 'Supercar Driver'});
             if(data.some(c => String(c.Fuel).toLowerCase() === 'electric')) badges.push({icon: '⚡', title: 'Electric Pioneer'});
-            if(data.some(c => Number(c.Cylinders) === 12 || String(c.Name).includes('V12'))) badges.push({icon: '👑', title: 'V12 Club'});
+            if(data.some(c => Number(c.Cylinders) === 12 || String(c.Name).includes('V12') || Number(c.Power) > 500)) badges.push({icon: '👑', title: 'V12 Club'});
             if(new Set(data.map(c=>c.Country).filter(Boolean)).size >= 5) badges.push({icon: '🌍', title: 'Global Explorer'});
             if(data.reduce((s,c)=>s+(Number(c['Mileage (est)'])||0),0) > 100000) badges.push({icon: '🛣️', title: '100k Club'});
             return badges;
@@ -305,8 +296,8 @@
 
         const getSegmentStyle = (seg) => {
             const s = String(seg).toLowerCase();
-            if(s === 'performance' || s === 'sport') return 'bg-red-500/10 text-red-500 border-red-500/20';
-            if(s === 'luxury') return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+            if(s === 'performance' || s === 'supercar') return 'bg-red-500/10 text-red-500 border-red-500/20';
+            if(s === 'luxury' || s === 'suv') return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
             if(s === 'comfort' || s === 'economy') return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
             return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
         };
@@ -658,6 +649,7 @@
                 if (car.ImageUrl) { setCarImage(car.ImageUrl); return; }
                 
                 setCarImage('');
+                setAiStory(''); // Reset story when car changes
                 const searchYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
                 const queryWithYear = encodeURIComponent(`${car.Make} ${car.Model} ${searchYear}`);
                 const queryBrandModel = encodeURIComponent(`${car.Make} ${car.Model}`);
@@ -684,12 +676,17 @@
             const generateAiStory = async () => {
                 if (!car) return;
                 setIsGeneratingStory(true);
-                const targetYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
-                const prompt = `Lütfen şu araç hakkında tutkulu, kısa ve etkileyici bir otomotiv dergisi incelemesi/hikayesi yaz (Türkçe): ${targetYear} ${car.Make} ${car.Model}. Bu araç ${car.Power} beygir gücünde, ${car.Engine}L motor hacmine sahip ve ${car.Transmission} vitesli bir ${car.Drive} araç. Kullanıcının bu araçla ilgili kişisel notu: "${car.Story || 'Yok'}". Bu notu da hikayeye yedir. En fazla 2 paragraf olsun. Yıldız (*) gibi markdown sembolleri KULLANMA. Düz metin ver.`;
-                
-                const response = await callGemini(prompt, "Sen dünyaca ünlü bir otomobil gazetecisisin. İnsanların arabalarla olan duygusal bağlarını anlatan etkileyici ve havalı metinler yazarsın.");
-                setAiStory(response);
-                setIsGeneratingStory(false);
+                try {
+                    const targetYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
+                    const prompt = `Lütfen şu araç hakkında tutkulu, kısa ve etkileyici bir otomotiv dergisi incelemesi/hikayesi yaz (Türkçe): ${targetYear} ${car.Make} ${car.Model}. Bu araç ${car.Power} beygir gücünde, ${car.Engine}L motor hacmine sahip ve ${car.Transmission} vitesli bir ${car.Drive} araç. Kullanıcının bu araçla ilgili kişisel notu: "${car.Story || 'Yok'}". Bu notu da hikayeye yedir. En fazla 2 paragraf olsun. Yıldız (*) gibi markdown sembolleri KULLANMA. Düz metin ver.`;
+                    
+                    const response = await callGemini(prompt, "Sen dünyaca ünlü bir otomobil gazetecisisin. İnsanların arabalarla olan duygusal bağlarını anlatan etkileyici ve havalı metinler yazarsın.");
+                    setAiStory(response);
+                } catch (error) {
+                    setAiStory("Hikaye oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
+                } finally {
+                    setIsGeneratingStory(false);
+                }
             };
 
             if (!car) return null;
@@ -982,23 +979,20 @@
                 
                 const normalize = (str) => (str || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
                 const searchMake = normalize(form.Make); const searchModel = normalize(form.Model);
-                const searchYear = parseInt(form['Model Year']); // Yeni eklendi: Model Yılını tespit et
+                const searchYear = parseInt(form['Model Year']); 
                 
                 const isMatch = (c) => normalize(c.Make).includes(searchMake) && normalize(c.Model).includes(searchModel);
 
                 let match = null;
 
-                // 1. Önce eski verilerinizde "TAM MODEL YILI" eşleşmesi var mı diye bak
                 if (!isNaN(searchYear)) {
                     match = existingData.find(c => isMatch(c) && parseInt(c['Model Year'] || String(c['Driving Year']).split('-')[0]) === searchYear);
                 }
 
-                // 2. Eğer yoksa, Yerel Veritabanında (localCarDB) o yılı kapsayan (MinYear-MaxYear) bir üretim var mı diye bak
                 if (!match && !isNaN(searchYear)) {
                     match = localCarDB.find(c => isMatch(c) && c.MinYear <= searchYear && c.MaxYear >= searchYear);
                 }
 
-                // 3. Yıl eşleşmesi bulunamazsa veya Model Yılı girilmemişse, isme uyan ilk aracı getir (Fallback)
                 if (!match) {
                     match = existingData.find(isMatch) || localCarDB.find(isMatch);
                 }
@@ -1125,12 +1119,17 @@
 
             const runAnalysis = async () => {
                 setIsAnalyzing(true);
-                const carList = data.map(c => `${c.Make} ${c.Model} (${c.Segment}, ${c.Power}HP)`).join(", ");
-                const prompt = `İşte benim sürdüğüm arabaların listesi: ${carList}. Lütfen bir otomotiv psikoloğu olarak garajımı analiz et. Benim nasıl bir sürücü karakterine sahip olduğumu eğlenceli, profesyonel ve hafif esprili bir dille (Türkçe) açıkla. Bana bir "Sürücü Unvanı" ver (örn: "Alman Mühendisliği Aşığı" veya "Performans Delisi"). 2 veya 3 paragraf olsun. Çıktıda * ve # gibi markdown işaretleri KULLANMA, temiz düz metin ver.`;
-                
-                const response = await callGemini(prompt, "Sen uzman bir otomobil profili analisti ve psikologsun. Kullanıcıların araba garajına bakarak onlara havalı bir analiz sunarsın.");
-                setAnalysis(response);
-                setIsAnalyzing(false);
+                try {
+                    const carList = data.map(c => `${c.Make} ${c.Model} (${c.Segment}, ${c.Power}HP)`).join(", ");
+                    const prompt = `İşte benim sürdüğüm arabaların listesi: ${carList}. Lütfen bir otomotiv psikoloğu olarak garajımı analiz et. Benim nasıl bir sürücü karakterine sahip olduğumu eğlenceli, profesyonel ve hafif esprili bir dille (Türkçe) açıkla. Bana bir "Sürücü Unvanı" ver (örn: "Alman Mühendisliği Aşığı" veya "Performans Delisi"). 2 veya 3 paragraf olsun. Çıktıda * ve # gibi markdown işaretleri KULLANMA, temiz düz metin ver.`;
+                    
+                    const response = await callGemini(prompt, "Sen uzman bir otomobil profili analisti ve psikologsun. Kullanıcıların araba garajına bakarak onlara havalı bir analiz sunarsın.");
+                    setAnalysis(response);
+                } catch (error) {
+                    setAnalysis("Analiz sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.");
+                } finally {
+                    setIsAnalyzing(false);
+                }
             };
 
             if (!isOpen) return null;
@@ -1150,6 +1149,7 @@
                                 <div className="text-center animate-pulse">
                                     <div className="text-5xl mb-4">🔮</div>
                                     <div className="text-purple-400 font-bold tracking-widest uppercase text-sm">Profiliniz Çözümleniyor...</div>
+                                    <div className="text-xs text-gray-500 mt-2">API'ye bağlanılıyor, bu işlem birkaç saniye sürebilir.</div>
                                 </div>
                             ) : (
                                 <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line relative z-10">
@@ -1172,7 +1172,6 @@
         const NewsTicker = ({ refreshTrigger }) => {
             const [newsItems, setNewsItems] = React.useState([]);
 
-            // Genişletilmiş gerçekçi otomotiv haber havuzu (Yenilendikçe içinden rastgele seçilecek)
             const allNewsPool = [
                 "📰 F1 2026 Season kicks off in Bahrain with the new engine regulations shaking up the grid.",
                 "📰 Ferrari unveils their first fully electric hypercar, breaking internet search records.",
@@ -1189,7 +1188,6 @@
             ];
 
             React.useEffect(() => {
-                // Her yenilemede haberleri karıştır ve 5 tanesini seç
                 const shuffled = [...allNewsPool].sort(() => 0.5 - Math.random());
                 setNewsItems(shuffled.slice(0, 5));
             }, [refreshTrigger]); 
@@ -1257,7 +1255,6 @@
 
             return (
                 <div className="py-12 border-t border-border mt-8 relative">
-                    {/* Background decorative elements */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-orange-500/5 via-purple-500/5 to-green-500/5 blur-3xl rounded-full pointer-events-none z-0"></div>
 
                     <div className="relative z-10">
@@ -1273,7 +1270,6 @@
                             </div>
                         </div>
 
-                        {/* Premium Segmented Bar */}
                         <div className="w-full h-12 bg-dark/60 p-1.5 rounded-2xl flex gap-1.5 mb-10 border border-white/5 shadow-inner backdrop-blur-md">
                             {stats.map(stat => (
                                 <div 
@@ -1288,7 +1284,6 @@
                             ))}
                         </div>
 
-                        {/* Enhanced Cards */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                             {stats.map(stat => (
                                 <div key={stat.id} className={`bg-gradient-to-b ${stat.fromCol} to-card border ${stat.borderCol} rounded-3xl p-6 relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-lg hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]`}>
@@ -1563,6 +1558,11 @@
                 }, 800);
             };
 
+            const loadMyDemoData = () => {
+                setData(myDemoData);
+                setProfileName("Yiğit");
+            };
+
             React.useEffect(() => { localStorage.setItem("carbio_data", JSON.stringify(data)); }, [data]);
             React.useEffect(() => { localStorage.setItem("carbio_profile", profileName); }, [profileName]);
 
@@ -1616,7 +1616,7 @@
                                 <CollectionGrid data={data} onCarClick={setSelectedCar} countryInfo={c => baseCountryData[c] || {flag:'📍', coords:null}} />
                             </>
                         ) : (
-                            <div className="py-16 md:py-24 text-center flex flex-col items-center max-w-2xl mx-auto">
+                            <div className="py-16 md:py-24 text-center flex flex-col items-center max-w-2xl mx-auto animate-fade-in">
                                 <div className="w-20 h-20 bg-dark border border-border rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(225,29,72,0.2)]">
                                     <IconMagic />
                                 </div>
@@ -1641,9 +1641,15 @@
                                     </ul>
                                 </div>
 
-                                <button onClick={() => setAddModalOpen(true)} className="bg-accent hover:bg-accentHover text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(225,29,72,0.4)]">
-                                    <IconPlus /> Add Your First Car
-                                </button>
+                                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                                    <button onClick={() => setAddModalOpen(true)} className="bg-accent hover:bg-accentHover text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(225,29,72,0.4)] flex-1">
+                                        <IconPlus /> Add Your First Car
+                                    </button>
+                                    <button onClick={loadMyDemoData} className="bg-dark hover:bg-border text-white border border-border px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-lg flex-1 group">
+                                        <span className="text-purple-400 group-hover:scale-125 transition-transform"><IconMagic /></span> Try My Demo
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-4">"Try My Demo" loads a sample garage based on 15 amazing cars.</p>
                             </div>
                         )}
                         
@@ -1706,7 +1712,7 @@
                         <p className="text-gray-500 text-sm font-medium">
                             Developed by <a href="https://www.linkedin.com/in/yigityuksel/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-accent transition-colors underline decoration-border hover:decoration-accent underline-offset-4 font-bold">Yigit Yuksel</a>
                         </p>
-                        <a href="mailto:carbiography@gmail.com" className="text-gray-400 hover:text-accent transition-colors text-xs mt-2 inline-block">carbiography@gmail.com</a>
+                        <a href="mailto:carbiography@gmail.com" className="text-gray-400 hover:text-accent transition-colors text-xs mt-2 inline-block">yuksel.ono@gmail.com</a>
                     </footer>
                 </div>
             );
