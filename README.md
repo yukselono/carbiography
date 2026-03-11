@@ -19,235 +19,146 @@ owned, or experienced --- and turn it into deep insights, AI analysis,
 and a beautiful shareable dashboard.
 </p>
 
-------------------------------------------------------------------------
+---
 
-# ✨ What is Carbiography?
+## ✨ What is Carbiography?
 
-**Carbiography** is a **client-side automotive dashboard** for
-enthusiasts who want to document their complete driving history.
+Carbiography is a highly interactive, beautifully designed, and deeply personalized automotive dashboard for car enthusiasts. With a sleek dark mode interface inspired by modern automotive dashboards, Carbiography acts as your personal digital garage log.
 
-It transforms your vehicle experiences into:
+**It allows you to:**
+* **Track** every vehicle you have ever driven.
+* **Analyze** your lifetime driving statistics.
+* **Discover** cultural insights about cars.
+* **Generate** AI-powered automotive stories.
+* **Share** your driving legacy with the world.
 
-• Powerful analytics\
-• AI‑generated driver personality insights\
-• Automotive cultural intelligence\
-• Beautiful social media scorecards
+---
 
-All running **100% inside your browser**.
+## 🚀 Key Features
 
-No servers.\
-No database.\
-Your data stays with you.
+### 📊 Deep Insights Dashboard
+Your entire automotive life visualized in one dashboard. Carbiography automatically calculates:
+- **Driver Score** & **Estimated Total Mileage**
+- **CO₂ Carbon Debt**
+- **Countries** you’ve driven in
+- **Brand Loyalty** metrics & **Lifetime** driving statistics
 
-------------------------------------------------------------------------
+### 📸 Wikipedia Vehicle Image Integration
+Simply enter `Make + Model + Year`. Carbiography automatically retrieves high-quality images from Wikipedia to populate your garage visually.
 
-# 🧠 Features
+### 🧠 AI Magazine Stories
+*Powered by Google Gemini AI.*
+With one click, generate a dramatic Top Gear-style magazine review blending real-world car prestige, technical specs, and your personal memories.
+> *"The engine roared to life with the kind of mechanical symphony that makes enthusiasts grin like children."*
 
-## 📊 Deep Automotive Insights
+### 🎬 Pop Culture Intelligence
+Your garage becomes part of automotive pop culture history. Carbiography analyzes your vehicles and reveals:
+- **Global Rarity**
+- Appearances in **Movies**
+- Appearances in **Video Games** (including famous titles like *Forza Motorsport* & *Gran Turismo*)
 
-Carbiography automatically calculates:
+### 🗓️ Driving Timeline & Vehicle Grid
+Visualize your car history through multiple dynamic views:
+* **Timeline Mode:** See vehicles in chronological order based on the year you drove them.
+* **Garage Grid:** Filter vehicles by Brand, Segment, or Fuel Type.
 
--   Total horsepower of vehicles you've driven
--   Estimated kilometers traveled
--   CO₂ emissions footprint
--   Number of trees required to offset emissions
--   Brand loyalty statistics
--   Overall **Carbiography Score**
+### 📁 Smart Excel / CSV Import
+Already have a car list? Import instantly using `.xlsx` or `.csv` formats. Powered by SheetJS, it's perfect for importing long driving histories in seconds.
 
-------------------------------------------------------------------------
+### 📱 Shareable Social Cards
+Export a stunning automotive summary card including your Name, Cars Driven, Total Mileage, Driver Score, and Environmental Footprint. Perfect for sharing on LinkedIn, Instagram, or X.
 
-## 🤖 AI Powered Garage Analysis
+### ☁️ Global Voting *(Firebase)*
+Carbiography includes a live **“Car of the Day”** voting system. Users worldwide can rate vehicles in real-time.
 
-Using **Google Gemini AI**, the system can:
+---
 
-### Driver Personality Profile
+## 🛠️ Tech Stack
 
-Analyze your garage and generate insights like:
+Carbiography is built as a **serverless, browser-native application**. It runs entirely in the browser—no backend required.
 
--   Driving character
--   Brand preferences
--   Performance vs comfort bias
--   Automotive personality archetype
+| Technology | Purpose |
+| :--- | :--- |
+| **HTML5 / CSS3** | Core structure |
+| **JavaScript (ES6+)** | Logic & Interactivity |
+| **React 18 (CDN)** | UI components |
+| **Tailwind CSS** | Sleek, modern styling |
+| **SheetJS** | Excel / CSV parsing |
+| **html2canvas** | Share card generation |
+| **Google Gemini API** | AI-generated stories |
+| **Firebase** *(Optional)* | Cloud voting system |
 
-------------------------------------------------------------------------
+---
 
-### AI Story Generator
+## 🏁 Getting Started
 
-Generate **magazine‑style automotive stories** based on:
+One of the best parts of Carbiography is its **zero-setup architecture**. No build tools. No npm. No servers.
 
--   Vehicle specifications
--   Your personal memories
-
-Example output:
-
-> "The turbo spooled up gently as the chassis settled into the
-> corner..."
-
-------------------------------------------------------------------------
-
-# 🌍 Automotive Culture Intelligence
-
-Every car entry is enriched with:
-
-🎮 Video games featuring the car\
-🎬 Movies where the vehicle appears\
-🏆 Cultural rarity estimates\
-📈 Global production/sales estimations
-
-You can even see:
-
-**What % of drivers worldwide have driven the same car.**
-
-------------------------------------------------------------------------
-
-# ⚡ Smart Vehicle Auto‑Fill
-
-Just type:
-
-Brand + Model + Year
-
-Carbiography automatically retrieves:
-
--   Engine size
--   Horsepower
--   Drivetrain
--   Segment
-
-------------------------------------------------------------------------
-
-# 📸 Shareable Social Scorecard
-
-Generate a **beautiful automotive identity card**.
-
-Perfect for sharing on:
-
--   LinkedIn
--   Instagram
--   X / Twitter
-
-Includes:
-
-• Your name\
-• Your strongest vehicle\
-• Key driving metrics\
-• Carbiography score
-
-Exported as **PNG**.
-
-------------------------------------------------------------------------
-
-# 🧰 Tech Stack
-
-  Technology          Purpose
-  ------------------- -----------------------
-  React 18            Frontend UI
-  Tailwind CSS        Styling
-  html2canvas         Share card generation
-  SheetJS             Excel / CSV import
-  Google Gemini API   AI analysis
-  Wikipedia API       Vehicle images
-  Clearbit            Brand logos
-
-The entire application runs in **one single HTML file**.
-
-------------------------------------------------------------------------
-
-# 🚀 Quick Start
-
-## Run Locally
-
-1.  Download the repository
-2.  Open:
-
-```{=html}
-<!-- -->
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/yourusername/carbiography.git](https://github.com/yourusername/carbiography.git)
+cd carbiography
 ```
-    index.html
 
-That's it.
+### 2. Run Locally
+Simply open `index.html` in your browser. That’s it! 
+*(For development convenience, you can also use VSCode Live Server).*
 
-No install required.
+### 3. Deploy with GitHub Pages
+Since the app is fully static, deployment is instant:
+1. Upload the repository to GitHub.
+2. Go to **Settings → Pages**.
+3. Select **Deploy from branch → main / root**.
+4. Save. Your app will be live at: `https://username.github.io/carbiography`
 
-------------------------------------------------------------------------
+---
 
-## Deploy Free with GitHub Pages
+## 📂 Demo Portfolio Feature
 
-1.  Upload repository
-2.  Go to **Settings → Pages**
-3.  Select **main branch**
-4.  Click **Save**
+Want to see the dashboard populated instantly? Carbiography supports a demo data loader.
 
-Your app will be live at:
+**Setup:** Place a file named `demo.xlsx` or `demo.csv` in the project root.
+**Use:** Open the app and click **🏁 Try Demo Portfolio**. The dashboard will instantly populate with your demo data.
 
-    https://username.github.io/carbiography
+---
 
-------------------------------------------------------------------------
+## ⚙️ Advanced Configurations
 
-# 💡 Example Use Case
+Carbiography works perfectly without APIs, but adding them unlocks powerful advanced features.
 
-Imagine this garage history:
+### 🤖 AI Stories (Google Gemini)
+To enable AI articles:
+1. Click **✨ Generate AI Article** in the app.
+2. Enter your Gemini API key (Get a free key from [Google AI Studio](https://aistudio.google.com)).
+*Note: The key is stored locally and securely in your browser.*
 
--   BMW M3
--   Toyota Supra
--   Porsche Cayman
--   Honda Civic Type R
+### ☁️ Global Voting (Firebase)
+To enable the Car of the Day voting system:
+1. Create a Firebase project and enable **Firestore**.
+2. Enable **Anonymous Authentication**.
+3. Update the config inside `index.html`:
 
-Carbiography will generate:
+```javascript
+const fallbackConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
+};
+```
 
-• Total horsepower driven\
-• Driving personality profile\
-• Environmental impact\
-• Cultural rarity score
+---
 
-All visualized instantly.
+## 👨‍💻 Developer
 
-------------------------------------------------------------------------
+**Created by Yiğit Yüksel** *Automotive enthusiast and technology builder.* 🔗 [LinkedIn Profile](https://linkedin.com/in/yigityuksel)
 
-# 🔮 Roadmap
+---
 
-Planned future features:
+## ⭐ Support the Project
 
--   User accounts
--   Cloud sync
--   Public shareable profiles
--   Car journey heatmaps
--   Global garage leaderboard
--   Community car culture database
+If you like the idea of Carbiography, consider:
+- ⭐ **Starring** the repository
+- 🚗 **Sharing** your own Carbiography dashboard
+- 🧠 **Contributing** ideas and improvements
 
-Future architecture:
-
--   Next.js
--   Supabase
--   Cloud analytics
-
-------------------------------------------------------------------------
-
-# 👨‍💻 Developer
-
-Created by **Yiğit Yüksel**\
-Automotive & technology enthusiast.
-
-LinkedIn\
-https://linkedin.com/in/yigityuksel
-
-Contact\
-carbiography@gmail.com
-
-------------------------------------------------------------------------
-
-# ⭐ Support the Project
-
-If you like the concept:
-
-⭐ Star the repository\
-🚗 Share your Carbiography\
-🧠 Suggest new features
-
-------------------------------------------------------------------------
-
-# ⚠️ Disclaimer
-
-Carbiography is an **open‑source concept project**.
-
-Vehicle statistics, rarity estimates, and cultural references are based
-on **approximate publicly available data**.
+> **⚠️ Disclaimer:** Carbiography is an open-source concept project. Vehicle statistics, rarity estimates, and cultural references are based on public data and estimations.
