@@ -4,35 +4,20 @@
 <p align="center">
   <img src="/banner.png" alt="Carbiography Banner">
 </p>
-```{=html}
 <p align="center">
-```
-`<img src="(https://raw.githubusercontent.com/placeholder/carbiography/main/assets/banner.png)(https://github.com/yukselono/carbiography/blob/main/banner.png)" width="100%" alt="Carbiography Banner">`{=html}
-```{=html}
+<img src="https://img.shields.io/badge/status-prototype-blue">
+<img src="https://img.shields.io/badge/made%20with-React-61DAFB">
+<img src="https://img.shields.io/badge/style-Tailwind-38B2AC">
+<img src="https://img.shields.io/badge/AI-Google%20Gemini-purple">
+<img src="https://img.shields.io/badge/license-MIT-green">
+<img src="https://img.shields.io/github/stars/yukselono/carbiography?style=social">
 </p>
-```
-```{=html}
 <p align="center">
-```
-`<img src="https://img.shields.io/badge/status-prototype-blue">`{=html}
-`<img src="https://img.shields.io/badge/made%20with-React-61DAFB">`{=html}
-`<img src="https://img.shields.io/badge/style-Tailwind-38B2AC">`{=html}
-`<img src="https://img.shields.io/badge/AI-Google%20Gemini-purple">`{=html}
-`<img src="https://img.shields.io/badge/license-MIT-green">`{=html}
-`<img src="https://img.shields.io/github/stars/yourusername/carbiography?style=social">`{=html}
-```{=html}
-</p>
-```
-```{=html}
-<p align="center">
-```
-`<b>`{=html}Carbiography is the Spotify Wrapped of
-cars.`</b>`{=html}`<br>`{=html} Track every vehicle you've driven,
+<b>Carbiography is the Spotify Wrapped of
+cars.</b><br>Track every vehicle you've driven,
 owned, or experienced --- and turn it into deep insights, AI analysis,
 and a beautiful shareable dashboard.
-```{=html}
 </p>
-```
 
 ------------------------------------------------------------------------
 
