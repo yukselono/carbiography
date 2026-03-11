@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbiography - Personal Automotive Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0F0F0F',
+                        card: '#1A1A1A',
+                        border: '#2A2A2A',
+                        accent: '#E11D48',
+                        accentHover: '#BE123C'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- SheetJS for Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Recharts -->
+    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@1.8.5/umd/Recharts.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0F0F0F; }
+        ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #E11D48; }
+        body { background-color: #0F0F0F; color: #FFFFFF; }
+        
+        .timeline-scroll { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .timeline-item { scroll-snap-align: start; }
+        .timeline-line { position: absolute; top: 24px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #E11D48 0%, #2A2A2A 100%); z-index: 0; }
+        .leaflet-container { background: #0F0F0F !important; font-family: 'Inter', sans-serif; }
+        .leaflet-bar a { background-color: #1A1A1A !important; color: #fff !important; border-color: #2A2A2A !important; }
+        @keyframes pulse-accent {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee { animation: marquee 35s linear infinite; }
+        .animate-marquee:hover { animation-play-state: paused; }
+        .map-pin { width: 14px; height: 14px; background-color: #E11D48; border-radius: 50%; animation: pulse-accent 2s infinite; border: 2px solid #fff; }
+        select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- ICONS ---
+        const IconUpload = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
+        const IconDownload = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
+        const IconShare = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>;
+        const IconPlus = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
+        const IconX = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+        const IconTrash = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>;
+        const IconStar = ({ filled }) => <svg width="12" height="12" viewBox="0 0 24 24" fill={filled ? "#E11D48" : "none"} stroke={filled ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+        const IconMagic = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2.5 2v6h6M21.5 22v-6h-6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>;
+        const IconEdit = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
+        const IconGlobe = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
+
+        const IconTwitter = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>;
+        const IconLinkedIn = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>;
+        const IconFacebook = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>;
+        const IconCoffee = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>;
+        const IconTrending = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>;
+        const IconCalendar = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>;
+        const IconExternalLink = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>;
+        const IconLocation = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
+        const IconTicket = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 12h20M7 5v14M17 5v14"></path></svg>;
+        const IconGamepad = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><path d="M22 12a10 10 0 0 0-20 0v2a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5v-2z"></path></svg>;
+        const IconPlay = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
+        const IconVote = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>;
+        const IconRefresh = ({ spinning }) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={spinning ? "animate-spin" : ""}><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>;
+
+        // --- MOCK API DATABASE FOR SMART AUTOFILL ---
+        const localCarDB = [
+            { Make: 'BMW', Model: '320i', Power: 170, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
+            { Make: 'BMW', Model: '520i', Power: 170, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
+            { Make: 'BMW', Model: 'M3', MinYear: 1986, MaxYear: 1991, Power: 200, Engine: 2.3, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'BMW', Model: 'M3', MinYear: 1992, MaxYear: 1999, Power: 286, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'BMW', Model: 'M3', MinYear: 2000, MaxYear: 2006, Power: 343, Engine: 3.2, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'BMW', Model: 'M3', MinYear: 2007, MaxYear: 2013, Power: 420, Engine: 4.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'BMW', Model: 'M3', MinYear: 2014, MaxYear: 2019, Power: 431, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'BMW', Model: 'M3', MinYear: 2020, MaxYear: 2030, Power: 510, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
+            { Make: 'Audi', Model: 'A3', Power: 150, Engine: 1.4, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Audi', Model: 'A4', Power: 150, Engine: 1.4, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Luxury' },
+            { Make: 'Audi', Model: 'S3', Power: 300, Engine: 2.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
+            { Make: 'Mercedes', Model: 'C200', Power: 184, Engine: 1.5, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
+            { Make: 'Tesla', Model: 'Model 3', Power: 283, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
+            { Make: 'Tesla', Model: 'Model S', Power: 670, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Luxury' },
+            { Make: 'Volkswagen', Model: 'Golf', Power: 110, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Volkswagen', Model: 'Polo', Power: 95, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Volkswagen', Model: 'Passat', Power: 150, Engine: 1.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
+            { Make: 'Volkswagen', Model: 'Tiguan', Power: 150, Engine: 1.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
+            { Make: 'Ford', Model: 'Focus', Power: 125, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Ford', Model: 'Mustang', Power: 450, Engine: 5.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'Renault', Model: 'Clio', Power: 90, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Renault', Model: 'Megane', Power: 115, Engine: 1.5, Fuel: 'Diesel', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Toyota', Model: 'Corolla', Power: 122, Engine: 1.8, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Toyota', Model: 'Yaris', Power: 116, Engine: 1.5, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Nissan', Model: 'Qashqai', Power: 158, Engine: 1.3, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
+            { Make: 'Hyundai', Model: 'Tucson', Power: 150, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
+            { Make: 'Kia', Model: 'Sportage', Power: 150, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
+            { Make: 'Dacia', Model: 'Duster', Power: 115, Engine: 1.5, Fuel: 'Diesel', Transmission: 'Manual', Drive: 'AWD', Segment: 'Economy' },
+            { Make: 'Opel', Model: 'Corsa', Power: 100, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Opel', Model: 'Astra', Power: 130, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort' },
+            { Make: 'Peugeot', Model: '208', Power: 100, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Peugeot', Model: '3008', Power: 130, Engine: 1.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Volvo', Model: 'XC40', Power: 252, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Luxury' },
+            { Make: 'Honda', Model: 'Civic', Power: 125, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
+            { Make: 'Aston Martin', Model: 'Vantage', Power: 503, Engine: 4.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'Porsche', Model: '911', Power: 450, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
+            { Make: 'Ferrari', Model: '458', Power: 570, Engine: 4.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
+            { Make: 'Audi', Model: 'R8', Power: 610, Engine: 5.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Supercar' },
+            { Make: 'Nissan', Model: 'GT-R', Power: 565, Engine: 3.8, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Supercar' },
+            { Make: 'Lamborghini', Model: 'Huracan', Power: 610, Engine: 5.2, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Supercar' },
+            { Make: 'Bugatti', Model: 'Veyron', Power: 1001, Engine: 8.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Hypercar' }
+        ];
+
+        // --- AUTOMOTIVE CULTURAL INTELLIGENCE (GAMES, MOVIES, RARITY) ---
+        const carCultureDB = {
+            'ferrari458': { games: ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa', 'Need for Speed Rivals'], movies: ['Transformers: Dark of the Moon', 'The Counselor'], production: 6000, rarity: 'Ultra Rare' },
+            'ferrari458spider': { games: ['Forza Horizon 5', 'The Crew 2'], movies: ['Fast & Furious 6 (Background)'], production: 4000, rarity: 'Ultra Rare' },
+            'astonmartindb9': { games: ['Need for Speed: Most Wanted', 'Test Drive Unlimited', 'Forza Motorsport'], movies: ['Casino Royale', 'Fast & Furious 6', 'Entourage'], production: 16500, rarity: 'Rare' },
+            'astonmartinvanquish': { games: ['Need for Speed: Hot Pursuit', 'Gran Turismo 6'], movies: ['Die Another Day (007)'], production: 2500, rarity: 'Ultra Rare' },
+            'porsche911': { games: ['Need for Speed: Porsche Unleashed', 'Gran Turismo 7', 'Real Racing 3'], movies: ['Bad Boys', 'Cars (Sally Carrera)', 'Gone in 60 Seconds'], production: 1100000, rarity: 'Rare' },
+            'bmwm3': { games: ['Need for Speed: Most Wanted', 'Forza Horizon', 'Gran Turismo'], movies: ['Mission: Impossible - Rogue Nation'], production: 300000, rarity: 'Uncommon' },
+            'fordmustang': { games: ['Need for Speed', 'Forza Horizon', 'The Crew'], movies: ['John Wick', 'Bullitt', 'I Am Legend'], production: 10000000, rarity: 'Common' },
+            'audis3': { games: ['Forza Horizon 4', 'Gran Turismo 6'], movies: ['Hitman: Agent 47 (Cameo)'], production: 150000, rarity: 'Uncommon' },
+            'audiq7': { games: ['Forza Motorsport 4'], movies: ['Captain America: Civil War', 'Taken'], production: 600000, rarity: 'Uncommon' },
+            'audir8': { games: ['Need for Speed Carbon', 'Forza Horizon 5', 'Gran Turismo 7'], movies: ['Iron Man', 'Avengers: Age of Ultron', 'Kingsglaive'], production: 40000, rarity: 'Rare' },
+            'nissangtr': { games: ['Gran Turismo 7', 'Need for Speed', 'Forza Horizon 5'], movies: ['Fast & Furious 6', 'Furious 7', 'Elysium'], production: 40000, rarity: 'Rare' },
+            'lamborghinihuracan': { games: ['Forza Horizon 5', 'Asphalt 9', 'The Crew 2'], movies: ['Doctor Strange'], production: 20000, rarity: 'Ultra Rare' },
+            'bugattiveyron': { games: ['Need for Speed: Hot Pursuit', 'Forza Motorsport', 'Gran Turismo PSP'], movies: ['Transformers: Age of Extinction', 'Need for Speed'], production: 450, rarity: 'Legendary' },
+            'vwgolf': { games: ['Gran Turismo 7', 'Forza Horizon 5', 'Need for Speed'], movies: ['The Fast and the Furious', 'Hot Fuzz'], production: 35000000, rarity: 'Common' },
+            'toyotacorolla': { games: ['Gran Turismo 7'], movies: [], production: 50000000, rarity: 'Common' },
+            'bmw320i': { games: ['Need for Speed: Most Wanted', 'Gran Turismo'], movies: ['Mission: Impossible - Rogue Nation'], production: 3000000, rarity: 'Common' },
+            'teslamodel3': { games: ['PUBG Mobile', 'Gran Turismo 7'], movies: ['Leave the World Behind'], production: 2000000, rarity: 'Uncommon' },
+            'fiat500': { games: ['Forza Horizon 5', 'Gran Turismo Sport'], movies: ['Spectre (007)', 'Lupin III'], production: 6000000, rarity: 'Common' },
+            'alfaromeogiulietta': { games: ['Gran Turismo 6', 'Forza Motorsport 5'], movies: ['Fast & Furious 6'], production: 400000, rarity: 'Uncommon' }
+        };
+
+        const getCarCultureData = (make, model, power, segment) => {
+            const normalize = (str) => (str || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+            const key = normalize(make) + normalize(model);
+            let data = carCultureDB[key];
+
+            if (!data) {
+                const brandKey = normalize(make);
+                const brandMatches = Object.keys(carCultureDB).filter(k => k.startsWith(brandKey));
+                if (brandMatches.length > 0) {
+                    data = { ...carCultureDB[brandMatches[0]], games: ['Various Generic Racing Games'], movies: ['Background Extra in Various Movies'], production: carCultureDB[brandMatches[0]].production * 1.5 };
+                }
+            }
+
+            if (!data) {
+                let estProduction = 5000000;
+                let rarity = 'Common';
+                let games = [];
+                let movies = [];
+                const hp = Number(power) || 100;
+                const seg = String(segment).toLowerCase();
+
+                if (hp > 500 || seg.includes('performance') || seg.includes('supercar')) {
+                    estProduction = Math.floor(Math.random() * 8000) + 2000;
+                    rarity = 'Ultra Rare';
+                    games = ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa'];
+                    movies = ['Fast & Furious (Background)', 'James Bond (Cameo)'];
+                } else if (hp > 300 || seg.includes('luxury') || seg.includes('sport')) {
+                    estProduction = Math.floor(Math.random() * 150000) + 50000;
+                    rarity = 'Rare';
+                    games = ['Forza Motorsport', 'Need for Speed Unbound'];
+                    movies = ['Action Movie Chase Scene'];
+                } else if (hp > 200 || seg.includes('comfort')) {
+                    estProduction = Math.floor(Math.random() * 800000) + 200000;
+                    rarity = 'Uncommon';
+                    games = ['City Car Driving Simulator'];
+                    movies = ['Standard Background Vehicle'];
+                } else {
+                    games = ['Gran Turismo (Generic Class)'];
+                }
+                data = { production: estProduction, rarity, games, movies };
+            }
+
+            const globalPop = 8000000000;
+            const percentile = ((data.production / globalPop) * 100).toFixed(5); 
+            
+            return {
+                ...data,
+                percentile,
+                formattedProduction: data.production >= 1000000 ? (data.production / 1000000).toFixed(1) + 'M' : data.production.toLocaleString()
+            };
+        };
+
+        // --- GEMINI API INTEGRATION ---
+        const callGemini = async (prompt, systemPrompt = "Sen uzman bir otomobil eleştirmeni ve yapay zeka asistanısın.") => {
+            const apiKey = "";
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < delays.length + 1; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Görünüşe göre yapay zeka şu an meşgul. Daha sonra tekrar deneyin.";
+                } catch (error) {
+                    if (i === delays.length) return "Yapay zeka servisine bağlanılamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.";
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        };
+
+        // --- HELPER ALGORITHMS ---
+        const calculateCO2 = (car) => {
+            const distance = Number(car['Mileage (est)']) || 0;
+            const hp = Number(car.Power) || 100;
+            const fuel = String(car.Fuel).toLowerCase();
+            let gPerKm = 120 + (hp * 0.4); 
+            if (fuel.includes('electric')) gPerKm = 0;
+            else if (fuel.includes('hybrid')) gPerKm = 80 + (hp * 0.2);
+            else if (fuel.includes('diesel')) gPerKm = 100 + (hp * 0.3);
+            return (gPerKm * distance) / 1000;
+        };
+
+        const calculateScore = (data) => {
+            if(data.length === 0) return 0;
+            const cars = data.length;
+            const countries = new Set(data.map(c=>c.Country).filter(Boolean)).size;
+            const totalHp = data.reduce((s,c)=>s+(Number(c.Power)||0),0);
+            const totalDist = data.reduce((s,c)=>s+(Number(c['Mileage (est)'])||0),0);
+            
+            let score = (cars * 1.5) + (countries * 3) + (totalHp / 200) + (totalDist / 5000);
+            return Math.min(Math.round(score), 99);
+        };
+
+        const getBadges = (data) => {
+            let badges = [];
+            if(data.some(c => Number(c.Power) >= 400)) badges.push({icon: '🏎️', title: 'Supercar Driver'});
+            if(data.some(c => String(c.Fuel).toLowerCase() === 'electric')) badges.push({icon: '⚡', title: 'Electric Pioneer'});
+            if(data.some(c => Number(c.Cylinders) === 12 || String(c.Name).includes('V12'))) badges.push({icon: '👑', title: 'V12 Club'});
+            if(new Set(data.map(c=>c.Country).filter(Boolean)).size >= 5) badges.push({icon: '🌍', title: 'Global Explorer'});
+            if(data.reduce((s,c)=>s+(Number(c['Mileage (est)'])||0),0) > 100000) badges.push({icon: '🛣️', title: '100k Club'});
+            return badges;
+        };
+
+        const baseCountryData = {
+            'Turkey': { flag: '🇹🇷', coords: [38.9637, 35.2433] }, 'Sweden': { flag: '🇸🇪', coords: [60.1282, 18.6435] },
+            'Germany': { flag: '🇩🇪', coords: [51.1657, 10.4515] }, 'UK': { flag: '🇬🇧', coords: [55.3781, -3.4360] },
+            'Italy': { flag: '🇮🇹', coords: [41.8719, 12.5674] }, 'Norway': { flag: '🇳🇴', coords: [60.4720, 8.4689] },
+            'USA': { flag: '🇺🇸', coords: [37.0902, -95.7129] }, 'France': { flag: '🇫🇷', coords: [46.2276, 2.2137] },
+            'Japan': { flag: '🇯🇵', coords: [36.2048, 138.2529] }, 'Spain': { flag: '🇪🇸', coords: [40.4637, -3.7492] },
+            'Scotland': { flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', coords: [56.4907, -4.2026] }, 'Jordan': { flag: '🇯🇴', coords: [30.5852, 36.2384] },
+            'Greece': { flag: '🇬🇷', coords: [39.0742, 21.8243] }
+        };
+
+        const getBrandDomain = (make) => {
+            return `${String(make).toLowerCase().replace(/\s/g, '')}.com`;
+        };
+
+        const getSegmentStyle = (seg) => {
+            const s = String(seg).toLowerCase();
+            if(s === 'performance' || s === 'sport') return 'bg-red-500/10 text-red-500 border-red-500/20';
+            if(s === 'luxury') return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+            if(s === 'comfort' || s === 'economy') return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+            return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+        };
+
+        // --- COMPONENTS ---
+        const BrandLogo = ({ make, className = "w-10 h-10" }) => {
+            const logoUrl = `https://logo.clearbit.com/${getBrandDomain(make)}`;
+            const fallbackUrl = `https://ui-avatars.com/api/?name=${make}&background=1A1A1A&color=fff&bold=true`;
+            return (
+                <div className={`${className} flex-shrink-0 flex items-center justify-center bg-white rounded-md p-1 shadow-sm overflow-hidden`}>
+                    <img src={logoUrl} alt={make} className="w-full h-full object-contain" onError={(e) => { e.target.onerror = null; e.target.src = fallbackUrl; }} />
+                </div>
+            );
+        };
+
+        const CarRating = ({ points }) => {
+            const r = Number(points) || 0;
+            const stars5 = Math.round(r / 2);
+            return (
+                <div className="flex items-center gap-0.5 mt-1">
+                    {[1,2,3,4,5].map(i => <IconStar key={i} filled={i <= stars5} />)}
+                </div>
+            );
+        };
+
+        // 1. Hero Section
+        const HeroSection = ({ profileName, onEditProfile, data, totalCars, totalDistance, totalCountries, yearsSpan, onShare, onUpload, onExport, onAdd, onReset, onVoteClick, onRefreshClick, isRefreshing, onAnalyze }) => {
+            const bgImages = [
+                "https://images.pexels.com/photos/3752194/pexels-photo-3752194.jpeg?auto=compress&cs=tinysrgb&w=1920",
+                "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=1920",
+                "https://images.pexels.com/photos/103290/pexels-photo-103290.jpeg?auto=compress&cs=tinysrgb&w=1920"
+            ];
+            
+            const [bgIndex, setBgIndex] = React.useState(0);
+            React.useEffect(() => {
+                const interval = setInterval(() => setBgIndex(prev => (prev + 1) % bgImages.length), 20000);
+                return () => clearInterval(interval);
+            }, [bgImages.length]);
+
+            const score = calculateScore(data);
+            const badges = getBadges(data);
+
+            return (
+                <div className="relative py-12 md:py-24 border-b border-border overflow-hidden w-full">
+                    <div className="absolute top-4 right-4 md:top-6 md:right-8 z-50 flex items-center gap-3 flex-wrap justify-end">
+                        <button onClick={onRefreshClick} disabled={isRefreshing} className="flex items-center gap-2 bg-dark text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-border transition border border-border shadow-md">
+                            <IconRefresh spinning={isRefreshing} /> {isRefreshing ? 'Refreshing...' : 'Refresh Feed'}
+                        </button>
+                        <button onClick={onVoteClick} className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-accent text-white px-4 py-1.5 rounded-full text-xs font-bold hover:scale-105 transition shadow-[0_0_15px_rgba(225,29,72,0.4)] animate-pulse border border-white/20">
+                            <IconVote /> Vote Today's Car
+                        </button>
+                        <a href="https://www.buymeacoffee.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#FFDD00] text-black px-3 py-1.5 rounded-full text-xs font-bold hover:scale-105 transition shadow-[0_0_15px_rgba(255,221,0,0.3)] hidden sm:flex">
+                            <IconCoffee /> Buy me a coffee
+                        </a>
+                    </div>
+                    <div className="absolute inset-0 z-0 opacity-30 pointer-events-none bg-dark">
+                        {bgImages.map((src, idx) => (
+                            <img key={idx} src={src} className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ease-in-out ${idx === bgIndex ? 'opacity-100' : 'opacity-0'}`} />
+                        ))}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/80 to-transparent z-10"></div>
+                    </div>
+                    <div className="relative z-20 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 text-center md:text-left max-w-7xl mx-auto px-4 sm:px-8">
+                        <div className="flex flex-col items-center md:items-start w-full md:w-auto">
+                            <div className="flex items-center gap-3 mb-4">
+                                <h2 className="text-accent font-bold tracking-widest text-xs uppercase cursor-pointer flex items-center gap-2 hover:text-white transition" onClick={onEditProfile}>
+                                    {profileName}'S CARBIOGRAPHY <IconEdit />
+                                </h2>
+                            </div>
+                            
+                            <div className="flex flex-col md:flex-row items-center gap-6 mb-6 w-full">
+                                {totalCars > 0 && (
+                                    <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-full border-4 border-dark bg-gradient-to-br from-accent to-purple-600 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(225,29,72,0.4)]">
+                                        <span className="text-3xl font-display font-bold text-white leading-none">{score}</span>
+                                        <span className="text-[9px] uppercase tracking-widest text-white/80">Score</span>
+                                    </div>
+                                )}
+                                <div>
+                                    <h1 className="text-4xl md:text-6xl font-display font-bold text-white tracking-tight mb-3">My Garage</h1>
+                                    <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                                        {badges.map((b, i) => (
+                                            <span key={i} className="px-3 py-1 bg-dark/80 border border-border rounded-full text-xs font-medium text-gray-300 backdrop-blur-md" title={b.title}>
+                                                {b.icon} <span className="hidden sm:inline ml-1">{b.title}</span>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 mt-4 md:mt-0 w-full md:w-auto">
+                            {totalCars > 0 && (
+                                <button onClick={onReset} className="bg-dark hover:bg-red-900/30 text-gray-400 hover:text-red-400 text-sm px-4 py-2.5 rounded-full border border-border hover:border-red-500/50 transition flex items-center gap-2 font-medium">
+                                    <IconTrash /> Reset
+                                </button>
+                            )}
+                            <button onClick={onAdd} className="bg-white hover:bg-gray-200 text-dark text-sm px-5 py-2.5 rounded-full transition flex items-center gap-2 font-bold shadow-lg">
+                                <IconPlus /> Add Car
+                            </button>
+                            <label className="cursor-pointer bg-card hover:bg-border text-white text-sm px-5 py-2.5 rounded-full border border-border transition flex items-center gap-2 font-medium">
+                                <IconUpload /> Import
+                                <input type="file" accept=".xlsx, .xls, .csv, .json" className="hidden" onChange={onUpload} />
+                            </label>
+                            {totalCars > 0 && (
+                                <button onClick={onExport} className="bg-card hover:bg-border text-white text-sm px-4 py-2.5 rounded-full border border-border transition flex items-center gap-2 font-medium hidden sm:flex">
+                                    <IconDownload /> JSON
+                                </button>
+                            )}
+                            {totalCars > 0 && (
+                                <button onClick={onAnalyze} className="bg-gradient-to-r from-purple-600/20 to-accent/20 hover:from-purple-600 hover:to-accent text-white text-sm px-5 py-2.5 rounded-full border border-purple-500/30 transition flex items-center gap-2 font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                                    ✨ AI Analysis
+                                </button>
+                            )}
+                            {totalCars > 0 && (
+                                <button onClick={onShare} className="bg-accent hover:bg-accentHover text-white text-sm px-5 py-2.5 rounded-full transition flex items-center gap-2 font-medium shadow-[0_0_15px_rgba(225,29,72,0.3)] w-full sm:w-auto justify-center">
+                                    <IconShare /> Share Card
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Deep Insights
+        const DeepInsights = ({ data, totalCO2, totalDistance }) => {
+            if(data.length === 0) return null;
+            
+            // Mevcut Hesaplamalar
+            const longestDrive = [...data].sort((a,b) => (Number(b['Mileage (est)'])||0) - (Number(a['Mileage (est)'])||0))[0];
+            const maxPower = [...data].sort((a,b) => (Number(b.Power)||0) - (Number(a.Power)||0))[0];
+            const treesOwed = Math.max(0, Math.round(totalCO2 / 21)); 
+
+            // YENİ: Marka Sadakati (En Çok Kullanılan Marka)
+            const brandCounts = data.reduce((acc, car) => {
+                if(car.Make) acc[car.Make] = (acc[car.Make] || 0) + 1;
+                return acc;
+            }, {});
+            const topBrand = Object.keys(brandCounts).sort((a,b) => brandCounts[b] - brandCounts[a])[0];
+
+            // YENİ: Küresel Kaşif (Farklı Ülke Sayısı)
+            const uniqueCountries = new Set(data.map(c => c.Country).filter(Boolean)).size;
+
+            // YENİ: Klasik Ruh (Kullanılan En Eski Model Yılına Sahip Araç)
+            const oldestCar = [...data].sort((a,b) => {
+                const yearA = parseInt(a['Model Year'] || String(a['Driving Year']).split('-')[0]) || 9999;
+                const yearB = parseInt(b['Model Year'] || String(b['Driving Year']).split('-')[0]) || 9999;
+                return yearA - yearB;
+            })[0];
+            const oldestYear = parseInt(oldestCar?.['Model Year'] || String(oldestCar?.['Driving Year']).split('-')[0]);
+            
+            return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    {/* Card 1: Longest Drive */}
+                    <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-blue-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+                        <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🛣️</div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+                            <div className="text-[10px] text-gray-500 font-bold tracking-widest uppercase relative z-10">LONGEST DRIVE</div>
+                        </div>
+                        <div className="text-2xl font-display font-bold text-white truncate relative z-10">{longestDrive?.Make} {longestDrive?.Model}</div>
+                        <div className="text-sm text-blue-400 mt-1 font-medium">{Number(longestDrive?.['Mileage (est)']||0).toLocaleString()} km</div>
+                    </div>
+
+                    {/* Card 2: Carbon Debt */}
+                    <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-green-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.1)]">
+                        <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🌳</div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+                            <div className="text-[10px] text-gray-500 font-bold tracking-widest uppercase relative z-10">CARBON DEBT</div>
+                        </div>
+                        <div className="text-2xl font-display font-bold text-white truncate relative z-10">~{treesOwed.toLocaleString()} Trees</div>
+                        <div className="text-sm text-gray-400 mt-1">Needed to offset {Math.round(totalCO2/1000)}t CO2</div>
+                    </div>
+
+                    {/* Card 3: Highest Power */}
+                    <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-accent/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(225,29,72,0.15)]">
+                        <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🚀</div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(225,29,72,0.8)]"></span>
+                            <div className="text-[10px] text-gray-500 font-bold tracking-widest uppercase relative z-10">HIGHEST POWER</div>
+                        </div>
+                        <div className="text-2xl font-display font-bold text-white truncate relative z-10">{maxPower?.Make} {maxPower?.Model}</div>
+                        <div className="text-sm text-accent mt-1 font-medium">{maxPower?.Power} HP</div>
+                    </div>
+
+                    {/* Card 4: Brand Loyalty */}
+                    <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-yellow-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(234,179,8,0.1)]">
+                        <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🏆</div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]"></span>
+                            <div className="text-[10px] text-gray-500 font-bold tracking-widest uppercase relative z-10">BRAND LOYALTY</div>
+                        </div>
+                        <div className="text-2xl font-display font-bold text-white truncate relative z-10">{topBrand || '-'}</div>
+                        <div className="text-sm text-yellow-500 mt-1 font-medium">Most driven manufacturer</div>
+                    </div>
+
+                    {/* Card 5: Global Explorer */}
+                    <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-teal-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(20,184,166,0.1)]">
+                        <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🌍</div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.8)]"></span>
+                            <div className="text-[10px] text-gray-500 font-bold tracking-widest uppercase relative z-10">GLOBAL EXPLORER</div>
+                        </div>
+                        <div className="text-2xl font-display font-bold text-white truncate relative z-10">{uniqueCountries} Countries</div>
+                        <div className="text-sm text-teal-400 mt-1 font-medium">International driving footprint</div>
+                    </div>
+
+                    {/* Card 6: Vintage Soul */}
+                    <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-orange-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(249,115,22,0.1)]">
+                        <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🕰️</div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]"></span>
+                            <div className="text-[10px] text-gray-500 font-bold tracking-widest uppercase relative z-10">VINTAGE SOUL</div>
+                        </div>
+                        <div className="text-2xl font-display font-bold text-white truncate relative z-10">{oldestCar?.Make} {oldestCar?.Model}</div>
+                        <div className="text-sm text-orange-400 mt-1 font-medium">{!isNaN(oldestYear) ? `'${oldestYear} Model Classic` : 'Oldest car driven'}</div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 3. Timeline
+        const Timeline = ({ data, onCarClick }) => {
+            const grouped = data.reduce((acc, car) => {
+                const match = String(car['Driving Year']).match(/\d{4}/);
+                const y = match ? parseInt(match[0]) : new Date().getFullYear();
+                if (!acc[y]) acc[y] = [];
+                acc[y].push(car); return acc;
+            }, {});
+            const years = Object.keys(grouped).sort((a,b) => b - a); // Sort newest first
+
+            return (
+                <div className="py-12 border-t border-border relative">
+                    <h3 className="font-display font-bold text-2xl mb-8">Driving Timeline</h3>
+                    <div className="relative">
+                        <div className="timeline-line hidden md:block"></div>
+                        <div className="flex flex-col md:flex-row gap-6 md:overflow-x-auto pb-6 relative z-10 md:px-2 timeline-scroll">
+                            {years.map(year => (
+                                <div key={year} className="timeline-item w-full md:min-w-[280px]">
+                                    <div className="hidden md:block w-3 h-3 rounded-full bg-accent border-[3px] border-dark mb-4 mx-auto relative z-10"></div>
+                                    <div className="text-left md:text-center font-display font-bold text-lg text-gray-300 mb-4 pl-4 md:pl-0 border-l-2 md:border-l-0 border-accent">{year}</div>
+                                    <div className="space-y-3 pl-4 md:pl-0">
+                                        {grouped[year].map((car, idx) => {
+                                            const modelYear = car['Model Year'] || car['Driving Year'] || '';
+                                            return (
+                                                <div key={idx} onClick={() => onCarClick(car)} className="group bg-card border border-border hover:border-accent p-4 rounded-xl cursor-pointer transition-all hover:-translate-y-1 shadow-sm">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className="font-bold text-base text-white leading-tight truncate">{car.Make} {car.Model}</div>
+                                                        <div className="text-[9px] text-gray-500 uppercase tracking-widest shrink-0 ml-2 bg-dark px-2 py-1 rounded">{car.Status}</div>
+                                                    </div>
+                                                    {car.Story && <div className="text-xs text-gray-400 italic truncate mb-2">"{car.Story}"</div>}
+                                                    <div className="flex justify-between items-center mt-2 border-t border-border pt-2">
+                                                        <div className="text-xs text-gray-400 font-medium">{modelYear} model • {car.Power} hp</div>
+                                                        <CarRating points={car.Points} />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 4. Grid
+        const CollectionGrid = ({ data, onCarClick }) => {
+            const [filters, setFilters] = React.useState({ year: 'All', make: 'All', segment: 'All', fuel: 'All' });
+            
+            const filtered = data.filter(c => {
+                if (filters.year !== 'All' && String(c['Driving Year']) !== filters.year) return false;
+                if (filters.make !== 'All' && c.Make !== filters.make) return false;
+                if (filters.segment !== 'All' && c.Segment !== filters.segment) return false;
+                if (filters.fuel !== 'All' && c.Fuel !== filters.fuel) return false;
+                return true;
+            });
+
+            const unique = {
+                years: ['All', ...new Set(data.map(c => c['Driving Year']).filter(Boolean))].sort(),
+                makes: ['All', ...new Set(data.map(c => c.Make).filter(Boolean))].sort(),
+                segments: ['All', ...new Set(data.map(c => c.Segment).filter(Boolean))].sort(),
+                fuels: ['All', ...new Set(data.map(c => c.Fuel).filter(Boolean))].sort()
+            };
+
+            return (
+                <div className="py-12 border-t border-border">
+                    <div className="flex flex-col lg:flex-row gap-8">
+                        {/* Filters Sidebar */}
+                        <div className="w-full lg:w-1/4 shrink-0">
+                            <div className="sticky top-6 bg-card border border-border rounded-2xl p-6">
+                                <h3 className="font-display font-bold text-lg mb-6 tracking-widest uppercase text-gray-400">Filters (By Drive Year)</h3>
+                                <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+                                    <div><label className="block text-xs text-gray-500 uppercase mb-2">Brand</label><select value={filters.make} onChange={e=>setFilters({...filters, make: e.target.value})} className="w-full bg-dark border border-border text-white text-sm rounded-lg p-3 outline-none">{unique.makes.map(x=><option key={x} value={x}>{x}</option>)}</select></div>
+                                    <div><label className="block text-xs text-gray-500 uppercase mb-2">Drive Year</label><select value={filters.year} onChange={e=>setFilters({...filters, year: e.target.value})} className="w-full bg-dark border border-border text-white text-sm rounded-lg p-3 outline-none">{unique.years.map(x=><option key={x} value={x}>{x}</option>)}</select></div>
+                                    <div><label className="block text-xs text-gray-500 uppercase mb-2">Segment</label><select value={filters.segment} onChange={e=>setFilters({...filters, segment: e.target.value})} className="w-full bg-dark border border-border text-white text-sm rounded-lg p-3 outline-none">{unique.segments.map(x=><option key={x} value={x}>{x}</option>)}</select></div>
+                                    <div><label className="block text-xs text-gray-500 uppercase mb-2">Fuel</label><select value={filters.fuel} onChange={e=>setFilters({...filters, fuel: e.target.value})} className="w-full bg-dark border border-border text-white text-sm rounded-lg p-3 outline-none">{unique.fuels.map(x=><option key={x} value={x}>{x}</option>)}</select></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Grid */}
+                        <div className="w-full lg:w-3/4">
+                            <h3 className="font-display font-bold text-2xl mb-6 flex justify-between items-end">
+                                Car Collection <span className="text-gray-500 text-lg font-medium">{filtered.length} cars</span>
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                                {filtered.map((car, idx) => {
+                                    const modelYear = car['Model Year'] || car['Driving Year'] || '';
+                                    return (
+                                        <div key={idx} onClick={() => onCarClick(car)} className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-accent transition-all group relative overflow-hidden flex flex-col h-full">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <BrandLogo make={car.Make} className="w-12 h-12 group-hover:scale-110 transition-transform shadow-md" />
+                                                <div className="text-right">
+                                                    <span className={`px-2 py-1 text-[9px] uppercase tracking-widest rounded-md border ${getSegmentStyle(car.Segment)}`}>{car.Segment || 'Standard'}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-lg text-white mb-1 truncate">{car.Make} {car.Model}</h4>
+                                                <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
+                                                    <span className="bg-dark px-2 py-0.5 rounded text-white border border-border">{modelYear}</span> • <span>{car.Power} hp</span>
+                                                </div>
+                                            </div>
+                                            <div className="pt-3 border-t border-border flex justify-between items-center mt-auto">
+                                                <CarRating points={car.Points} />
+                                                <span className="text-xs font-medium text-gray-300">{Number(car['Mileage (est)']).toLocaleString()} km</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            {filtered.length === 0 && <div className="text-gray-500 py-10 text-center bg-card rounded-xl border border-border">No cars found matching filters.</div>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Modal - Car Detail
+        const DetailModal = ({ car, onClose, onEdit, onDelete }) => {
+            const [carImage, setCarImage] = React.useState('');
+            const [aiStory, setAiStory] = React.useState('');
+            const [isGeneratingStory, setIsGeneratingStory] = React.useState(false);
+
+            React.useEffect(() => {
+                if (!car) return;
+                if (car.ImageUrl) { setCarImage(car.ImageUrl); return; }
+                
+                setCarImage('');
+                const searchYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
+                const queryWithYear = encodeURIComponent(`${car.Make} ${car.Model} ${searchYear}`);
+                const queryBrandModel = encodeURIComponent(`${car.Make} ${car.Model}`);
+
+                fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${queryWithYear}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=800&origin=*`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const pages = data.query?.pages;
+                        if (pages && Object.keys(pages)[0] !== "-1" && Object.values(pages)[0].thumbnail) {
+                            setCarImage(Object.values(pages)[0].thumbnail.source);
+                        } else {
+                            fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${queryBrandModel}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=800&origin=*`)
+                                .then(res => res.json())
+                                .then(data2 => {
+                                    const pages2 = data2.query?.pages;
+                                    if (pages2 && Object.keys(pages2)[0] !== "-1" && Object.values(pages2)[0].thumbnail) {
+                                        setCarImage(Object.values(pages2)[0].thumbnail.source);
+                                    }
+                                });
+                        }
+                    }).catch(() => {});
+            }, [car]);
+
+            const generateAiStory = async () => {
+                if (!car) return;
+                setIsGeneratingStory(true);
+                const targetYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
+                const prompt = `Lütfen şu araç hakkında tutkulu, kısa ve etkileyici bir otomotiv dergisi incelemesi/hikayesi yaz (Türkçe): ${targetYear} ${car.Make} ${car.Model}. Bu araç ${car.Power} beygir gücünde, ${car.Engine}L motor hacmine sahip ve ${car.Transmission} vitesli bir ${car.Drive} araç. Kullanıcının bu araçla ilgili kişisel notu: "${car.Story || 'Yok'}". Bu notu da hikayeye yedir. En fazla 2 paragraf olsun. Yıldız (*) gibi markdown sembolleri KULLANMA. Düz metin ver.`;
+                
+                const response = await callGemini(prompt, "Sen dünyaca ünlü bir otomobil gazetecisisin. İnsanların arabalarla olan duygusal bağlarını anlatan etkileyici ve havalı metinler yazarsın.");
+                setAiStory(response);
+                setIsGeneratingStory(false);
+            };
+
+            if (!car) return null;
+            
+            const targetYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
+            const ytSearchQuery = encodeURIComponent(`${car.Make} ${car.Model} ${targetYear} review`);
+            
+            // Get Automotive Cultural Intelligence Data
+            const cultureData = getCarCultureData(car.Make, car.Model, car.Power, car.Segment);
+            
+            const generatedReview = `The ${targetYear} ${car.Make} ${car.Model} offers a compelling driving experience. With its ${car.Engine}L engine delivering ${car.Power} horsepower, it stands out in the ${car.Segment || 'automotive'} segment. The ${String(car.Drive).toUpperCase() || 'standard'} drivetrain ensures solid handling. You drove this car in ${car['Driving Year'] || 'the past'} across a ${Number(car['Mileage (est)']).toLocaleString()} km journey.`;
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-md" onClick={onClose}>
+                    <div className="bg-card w-full max-w-5xl rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[95vh]" onClick={e => e.stopPropagation()}>
+                        
+                        {/* Header Image Area */}
+                        <div className="h-48 md:h-64 bg-dark relative flex items-end p-6 md:p-8 shrink-0">
+                            {carImage && <img src={carImage} className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-luminosity" />}
+                            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent"></div>
+                            
+                            {/* ACTION BUTTONS */}
+                            <div className="absolute top-4 right-4 md:top-6 md:right-6 flex items-center gap-2 z-20">
+                                <button onClick={onEdit} className="w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 bg-black/50 border border-white/10 backdrop-blur-md rounded-full transition-all hover:scale-110 shadow-lg" title="Edit Car"><IconEdit /></button>
+                                <button onClick={onDelete} className="w-10 h-10 flex items-center justify-center text-white hover:bg-red-500/80 bg-black/50 border border-white/10 backdrop-blur-md rounded-full transition-all hover:scale-110 shadow-lg" title="Delete Car"><IconTrash /></button>
+                                <div className="w-px h-5 bg-white/20 mx-1 hidden sm:block"></div>
+                                <button onClick={onClose} className="w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 bg-black/50 border border-white/10 backdrop-blur-md rounded-full transition-all hover:scale-110 shadow-lg" title="Close"><IconX /></button>
+                            </div>
+                            
+                            <div className="absolute top-4 left-4 md:top-6 md:left-6 flex gap-2 z-20">
+                                <span className="bg-dark/80 text-white text-xs px-3 py-1 rounded-full border border-border backdrop-blur-md">{baseCountryData[car.Country]?.flag} {car.Country || 'Global'}</span>
+                                <span className={`px-3 py-1 text-xs font-bold rounded-full border ${getSegmentStyle(car.Segment)} backdrop-blur-md bg-dark/80`}>{car.Segment || 'Standard'}</span>
+                            </div>
+
+                            <div className="flex items-center gap-4 md:gap-6 relative z-10 w-full">
+                                <BrandLogo make={car.Make} className="w-16 h-16 md:w-20 md:h-20 bg-white" />
+                                <div>
+                                    <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight">{car.Make}</h2>
+                                    <h3 className="text-lg md:text-2xl font-light text-gray-300">{car.Model} <span className="text-accent font-bold">'{targetYear}</span></h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 md:p-8 overflow-y-auto">
+                            {/* Personal Story Layer */}
+                            {car.Story && (
+                                <div className="mb-8 p-6 bg-dark border-l-4 border-accent rounded-r-2xl relative">
+                                    <div className="absolute top-2 left-2 text-4xl text-white/10 font-display">"</div>
+                                    <h4 className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">My Driving Story</h4>
+                                    <p className="text-gray-300 italic relative z-10 leading-relaxed">{car.Story}</p>
+                                </div>
+                            )}
+
+                            {/* Automotive Data Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 mb-8">
+                                <div className="bg-dark p-3 md:p-4 rounded-xl border border-border"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">POWER</div><div className="text-lg md:text-xl font-bold text-white">{car.Power} <span className="text-xs font-normal text-gray-400">hp</span></div></div>
+                                <div className="bg-dark p-3 md:p-4 rounded-xl border border-border"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">ENGINE</div><div className="text-lg md:text-xl font-bold text-white">{car.Engine}L <span className="text-xs font-normal text-gray-400">{car.Fuel}</span></div></div>
+                                <div className="bg-dark p-3 md:p-4 rounded-xl border border-border"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">DRIVEN IN</div><div className="text-lg md:text-xl font-bold text-white truncate" title={car['Driving Year'] || '-'}>{car['Driving Year'] || '-'}</div><div className="text-xs font-normal text-gray-400 mt-0.5">{Number(car['Mileage (est)']).toLocaleString()} km</div></div>
+                                <div className="bg-dark p-3 md:p-4 rounded-xl border border-border"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">DRIVETRAIN</div><div className="text-lg md:text-xl font-bold text-white">{car.Drive} <span className="text-xs font-normal text-gray-400">{car.Transmission === 'Automatic' ? 'Auto' : 'Man'}</span></div></div>
+                                <div className="bg-accent/10 p-3 md:p-4 rounded-xl border border-accent/30 col-span-2 md:col-span-4 lg:col-span-1">
+                                    <div className="text-[10px] text-accent font-bold uppercase tracking-widest mb-1">CO2 FOOTPRINT</div>
+                                    <div className="text-lg md:text-xl font-bold text-white">{Math.round(calculateCO2(car)).toLocaleString()} <span className="text-xs font-normal text-gray-400">kg</span></div>
+                                </div>
+                            </div>
+
+                            {/* 💎 NEW: AUTOMOTIVE CULTURAL INTELLIGENCE 💎 */}
+                            <div className="mb-8 border-t border-border pt-8">
+                                <h4 className="font-display font-bold text-xl mb-6 text-white flex items-center gap-2">
+                                    <IconGlobe /> Automotive Cultural Intelligence
+                                </h4>
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                    
+                                    {/* Rarity Card */}
+                                    <div className="bg-dark border border-border rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
+                                        <div className="absolute top-0 right-0 p-4 text-5xl opacity-5">💎</div>
+                                        <div>
+                                            <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">GLOBAL RARITY</div>
+                                            <div className={`text-2xl font-display font-bold mb-1 ${cultureData.rarity === 'Ultra Rare' ? 'text-purple-400' : cultureData.rarity === 'Rare' ? 'text-accent' : 'text-white'}`}>
+                                                {cultureData.rarity}
+                                            </div>
+                                            <div className="text-sm text-gray-400">~{cultureData.formattedProduction} units produced <br/><span className="text-[9px] opacity-70">(Estimated for this generation)</span></div>
+                                        </div>
+                                        <div className="mt-4 text-xs font-medium text-gray-300 bg-card p-3 rounded-xl border border-border">
+                                            You are among the top <span className="text-accent font-bold">{cultureData.percentile}%</span> of people on Earth who could experience this car.
+                                        </div>
+                                    </div>
+
+                                    {/* Games Card */}
+                                    <div className="bg-dark border border-border rounded-2xl p-5 relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-4 text-5xl opacity-5">🎮</div>
+                                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-4">VIDEO GAME APPEARANCES</div>
+                                        {cultureData.games.length > 0 ? (
+                                            <ul className="space-y-3">
+                                                {cultureData.games.map((game, i) => (
+                                                    <li key={i} className="text-sm text-gray-200 flex items-center gap-3">
+                                                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full shrink-0 shadow-[0_0_5px_rgba(34,197,94,0.5)]"></span> {game}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <div className="text-sm text-gray-500 italic">No major game appearances recorded.</div>
+                                        )}
+                                    </div>
+
+                                    {/* Movies Card */}
+                                    <div className="bg-dark border border-border rounded-2xl p-5 relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-4 text-5xl opacity-5">🎬</div>
+                                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-4">MOVIE APPEARANCES</div>
+                                        {cultureData.movies.length > 0 ? (
+                                            <ul className="space-y-3">
+                                                {cultureData.movies.map((movie, i) => (
+                                                    <li key={i} className="text-sm text-gray-200 flex items-center gap-3">
+                                                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full shrink-0 shadow-[0_0_5px_rgba(59,130,246,0.5)]"></span> {movie}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <div className="text-sm text-gray-500 italic">No major movie appearances recorded.</div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* AI Review & Video */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+                                <div>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h4 className="font-display font-bold text-lg text-white">Automotive Summary</h4>
+                                        <button onClick={generateAiStory} disabled={isGeneratingStory} className="text-[10px] bg-accent/20 hover:bg-accent text-accent hover:text-white px-2 py-1 rounded transition flex items-center gap-1 font-bold border border-accent/30">
+                                            {isGeneratingStory ? '✨ Üretiliyor...' : '✨ AI Hikaye Yazdır'}
+                                        </button>
+                                    </div>
+                                    <p className="text-sm text-gray-400 leading-relaxed bg-dark p-5 rounded-xl border border-border h-full whitespace-pre-line">
+                                        {aiStory || generatedReview}
+                                    </p>
+                                </div>
+                                <div>
+                                    <h4 className="font-display font-bold text-lg mb-3 text-white">Action Video</h4>
+                                    <div className="aspect-[16/9] bg-dark border border-border rounded-xl flex items-center justify-center overflow-hidden relative group cursor-pointer shadow-lg">
+                                        <a href={`https://www.youtube.com/results?search_query=${ytSearchQuery}`} target="_blank" rel="noopener noreferrer" className="absolute inset-0 flex flex-col items-center justify-center z-20">
+                                            <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors z-10"></div>
+                                            <div className="w-16 h-12 bg-red-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(220,38,38,0.5)] z-20">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                                            </div>
+                                            <span className="mt-3 text-xs font-medium text-white bg-dark/80 px-3 py-1 rounded-full backdrop-blur-sm z-20">Watch Review</span>
+                                        </a>
+                                        {carImage ? <img src={carImage} className="w-full h-full object-cover blur-[2px] opacity-60" /> : <div className="w-full h-full bg-[#111]"></div>}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Modal - Share Architecture
+        const ShareModal = ({ data, totalDistance, totalCO2, open, onClose, profileName }) => {
+            const [topCarImage, setTopCarImage] = React.useState('');
+            const [isCapturing, setIsCapturing] = React.useState(false);
+            const topCar = data.reduce((max, car) => (Number(car.Power) || 0) > (Number(max.Power) || 0) ? car : max, data[0]);
+
+            React.useEffect(() => {
+                if (!open || !topCar) return;
+                if (topCar.ImageUrl) { setTopCarImage(topCar.ImageUrl); return; }
+
+                const searchYear = topCar['Model Year'] || String(topCar['Driving Year']).split('-')[0] || '';
+                const queryWithYear = encodeURIComponent(`${topCar.Make} ${topCar.Model} ${searchYear}`);
+                
+                fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${queryWithYear}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=800&origin=*`)
+                    .then(res => res.json())
+                    .then(resData => {
+                        const pages = resData.query?.pages;
+                        if (pages && Object.keys(pages)[0] !== "-1" && Object.values(pages)[0].thumbnail) {
+                            setTopCarImage(Object.values(pages)[0].thumbnail.source);
+                        }
+                    }).catch(() => {});
+            }, [open, topCar]);
+
+            const downloadImage = () => {
+                if(!window.html2canvas) return;
+                setIsCapturing(true);
+                setTimeout(() => {
+                    window.html2canvas(document.getElementById('share-card-element'), { useCORS: true, backgroundColor: '#0F0F0F', scale: 2 }).then(canvas => {
+                        const link = document.createElement('a'); link.download = 'My-Carbiography.png'; link.href = canvas.toDataURL('image/png'); link.click(); setIsCapturing(false);
+                    });
+                }, 100);
+            };
+
+            const shareIntent = (platform) => {
+                const cultureData = topCar ? getCarCultureData(topCar.Make, topCar.Model, topCar.Power, topCar.Segment) : null;
+                const rarityText = cultureData && cultureData.rarity !== 'Common' ? ` (${cultureData.rarity})` : '';
+                
+                const text = `I just created my Carbiography! I've driven ${data.length} cars across ${totalDistance >= 1000 ? Math.round(totalDistance/1000) + 'k' : totalDistance} km. My top car is the ${topCar?.Make} ${topCar?.Model}${rarityText}. Create yours at carbiography.app!`;
+                const url = encodeURIComponent('https://carbiography.app'); 
+                
+                if (platform === 'twitter') window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+                if (platform === 'linkedin') window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+                if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+            };
+
+            if (!open) return null;
+            return (
+                <div className="fixed inset-0 z-50 flex flex-col md:flex-row items-center justify-center p-4 bg-black/95 backdrop-blur-md gap-8 overflow-y-auto" onClick={onClose}>
+                    <div onClick={e=>e.stopPropagation()} className="flex flex-col gap-6 items-center">
+                        <div id="share-card-element" className="w-[320px] sm:w-[380px] aspect-[4/5] bg-dark rounded-3xl border border-border flex flex-col justify-between relative overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.2)] shrink-0">
+                            {topCarImage && (
+                                <div className="absolute inset-0 z-0">
+                                    <div className="w-full h-full opacity-30 mix-blend-luminosity" style={{ backgroundImage: `url(${topCarImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/90 to-transparent"></div>
+                                </div>
+                            )}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 z-0 pointer-events-none"></div>
+                            <div className="relative z-10 p-8 flex flex-col h-full">
+                                <div><div className="text-accent font-bold tracking-widest text-[10px] uppercase mb-1">CARBIOGRAPHY</div><h2 className="text-3xl font-display font-bold text-white">{profileName}</h2></div>
+                                <div className="space-y-6 my-auto">
+                                    <div><div className="flex items-baseline gap-2"><div className="text-4xl font-display font-bold text-white">{data.length}</div><div className="text-lg font-light text-gray-400">Cars</div></div></div>
+                                    <div>
+                                        <div className="flex items-baseline gap-2"><div className="text-4xl font-display font-bold text-white">{totalDistance >= 1000 ? (totalDistance/1000).toFixed(1)+'k' : totalDistance}</div><div className="text-lg font-light text-gray-400">km</div></div>
+                                        <div className="text-xs text-accent mt-1 font-medium">🌍 {(totalDistance / 40075).toFixed(2)}x Earth loops</div>
+                                    </div>
+                                    <div>
+                                        <div className="flex items-baseline gap-2"><div className="text-4xl font-display font-bold text-white">{calculateScore(data)}</div><div className="text-lg font-light text-gray-400">Score</div></div>
+                                    </div>
+                                </div>
+                                <div className="border-t border-border pt-6 mt-4">
+                                    <div className="text-[10px] text-gray-400 font-bold tracking-widest uppercase mb-1">TOP CAR</div>
+                                    <div className="text-xl font-display font-bold text-white truncate">{topCar?.Make} {topCar?.Model}</div>
+                                    <div className="text-xs text-accent mt-2 font-medium">carbiography.app</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div onClick={e=>e.stopPropagation()} className="w-[320px] sm:w-[350px] bg-card border border-border p-6 rounded-3xl shrink-0 flex flex-col gap-4">
+                        <h3 className="font-display font-bold text-xl text-white mb-2">Share Your Journey</h3>
+                        <button onClick={downloadImage} disabled={isCapturing} className="w-full bg-accent hover:bg-accentHover text-white py-3 rounded-xl font-bold transition flex justify-center items-center gap-2">
+                            {isCapturing ? "Capturing..." : <><IconDownload /> Download Image</>}
+                        </button>
+                        <p className="text-[10px] text-gray-500 text-center mb-4">Export to post on Instagram.</p>
+
+                        <div className="grid grid-cols-3 gap-3">
+                            <button onClick={()=>shareIntent('twitter')} className="bg-dark hover:bg-border border border-border py-3 rounded-xl flex justify-center text-white transition"><IconTwitter /></button>
+                            <button onClick={()=>shareIntent('linkedin')} className="bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2]/20 border border-[#0A66C2]/30 py-3 rounded-xl flex justify-center transition"><IconLinkedIn /></button>
+                            <button onClick={()=>shareIntent('facebook')} className="bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2]/20 border border-[#1877F2]/30 py-3 rounded-xl flex justify-center transition"><IconFacebook /></button>
+                        </div>
+
+                        <button onClick={onClose} className="mt-2 text-gray-400 hover:text-white text-sm tracking-widest uppercase transition-colors">Close</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // Modal - Manual Data Entry (Add/Edit Car)
+        const AddCarModal = ({ isOpen, onClose, onSave, existingData, initialData }) => {
+            const [form, setForm] = React.useState({ Make: '', Model: '', 'Model Year': '', 'Driving Year': new Date().getFullYear().toString(), Power: '', Engine: '', Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort', 'Mileage (est)': '', Country: 'Turkey', Points: 5, Status: 'Owned', Story: '', ImageUrl: '' });
+            const [isAutoFilling, setIsAutoFilling] = React.useState(false);
+            const [autoFillStatus, setAutoFillStatus] = React.useState(''); 
+
+            React.useEffect(() => {
+                if (isOpen) {
+                    if (initialData) setForm(initialData);
+                    else setForm({ Make: '', Model: '', 'Model Year': '', 'Driving Year': new Date().getFullYear().toString(), Power: '', Engine: '', Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort', 'Mileage (est)': '', Country: 'Turkey', Points: 5, Status: 'Owned', Story: '', ImageUrl: '' });
+                }
+            }, [isOpen, initialData]);
+
+            if(!isOpen) return null;
+            const handleChange = (e) => setForm({...form, [e.target.name]: e.target.value});
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if(!form.Make || !form.Model) return alert("Make and Model are required.");
+                
+                // Fallback logic for save if Model Year is left empty by user
+                const finalForm = { ...form };
+                if (!finalForm['Model Year']) {
+                    finalForm['Model Year'] = String(finalForm['Driving Year']).split('-')[0].trim();
+                }
+
+                const newCar = { ...finalForm, Rating: "".repeat(Math.ceil(form.Points/2)) };
+                if (!newCar['#']) newCar['#'] = Date.now(); // assign unique ID if new
+
+                onSave(newCar);
+            };
+
+            const handleAutoFill = async () => {
+                if (!form.Make || !form.Model) return;
+                setIsAutoFilling(true); setAutoFillStatus('');
+                await new Promise(r => setTimeout(r, 400)); 
+                
+                const normalize = (str) => (str || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+                const searchMake = normalize(form.Make); const searchModel = normalize(form.Model);
+                const searchYear = parseInt(form['Model Year']); // Yeni eklendi: Model Yılını tespit et
+                
+                const isMatch = (c) => normalize(c.Make).includes(searchMake) && normalize(c.Model).includes(searchModel);
+
+                let match = null;
+
+                // 1. Önce eski verilerinizde "TAM MODEL YILI" eşleşmesi var mı diye bak
+                if (!isNaN(searchYear)) {
+                    match = existingData.find(c => isMatch(c) && parseInt(c['Model Year'] || String(c['Driving Year']).split('-')[0]) === searchYear);
+                }
+
+                // 2. Eğer yoksa, Yerel Veritabanında (localCarDB) o yılı kapsayan (MinYear-MaxYear) bir üretim var mı diye bak
+                if (!match && !isNaN(searchYear)) {
+                    match = localCarDB.find(c => isMatch(c) && c.MinYear <= searchYear && c.MaxYear >= searchYear);
+                }
+
+                // 3. Yıl eşleşmesi bulunamazsa veya Model Yılı girilmemişse, isme uyan ilk aracı getir (Fallback)
+                if (!match) {
+                    match = existingData.find(isMatch) || localCarDB.find(isMatch);
+                }
+                
+                if (match) {
+                    setForm(prev => ({ ...prev, Power: match.Power || prev.Power, Engine: match.Engine || prev.Engine, Fuel: match.Fuel || prev.Fuel, Transmission: match.Transmission || prev.Transmission, Drive: match.Drive || prev.Drive, Segment: match.Segment || prev.Segment }));
+                    setAutoFillStatus('success');
+                } else setAutoFillStatus('error');
+                
+                setIsAutoFilling(false); setTimeout(() => setAutoFillStatus(''), 3000);
+            };
+
+            return (
+                <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm" onClick={onClose}>
+                    <div className="bg-card w-full max-w-2xl rounded-t-3xl sm:rounded-3xl border border-border shadow-2xl overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center p-5 sm:p-6 border-b border-border bg-dark/50 shrink-0">
+                            <h3 className="font-display font-bold text-xl text-white">{initialData ? 'Edit Car' : 'Add New Car'}</h3>
+                            <button onClick={onClose} className="text-gray-400 hover:text-white bg-dark p-2 rounded-full"><IconX /></button>
+                        </div>
+                        
+                        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
+                            <div className="bg-dark/50 border border-border rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <div className="text-sm text-white font-bold flex items-center gap-2"><IconMagic /> Smart Auto-Fill</div>
+                                    <div className="text-xs text-gray-400 mt-1">Enter Make & Model to fetch technical specs automatically.</div>
+                                    {autoFillStatus === 'success' && <div className="text-xs text-green-400 mt-1 font-medium">✨ Specs loaded!</div>}
+                                </div>
+                                <button type="button" onClick={handleAutoFill} disabled={!form.Make || !form.Model || isAutoFilling} className={`w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-bold transition flex justify-center items-center gap-2 shrink-0 ${(!form.Make || !form.Model) ? 'bg-dark text-gray-600' : 'bg-accent/20 text-accent hover:bg-accent hover:text-white'}`}>
+                                    {isAutoFilling ? 'Searching...' : 'Fetch Specs'}
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="text-xs text-gray-500 uppercase mb-1 block">Make*</label><input required name="Make" onChange={handleChange} value={form.Make} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="BMW" /></div>
+                                <div><label className="text-xs text-gray-500 uppercase mb-1 block">Model*</label><input required name="Model" onChange={handleChange} value={form.Model} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="M3" /></div>
+                                
+                                <div className="col-span-2"><label className="text-xs text-gray-500 uppercase mb-1 block">Personal Story / Note</label><textarea name="Story" onChange={handleChange} value={form.Story} rows="2" className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="First time driving a V8..."></textarea></div>
+
+                                <div><label className="text-xs text-gray-500 uppercase mb-1 block">Model Year</label><input type="number" name="Model Year" onChange={handleChange} value={form['Model Year']} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="e.g. 1990" /></div>
+                                <div><label className="text-xs text-gray-500 uppercase mb-1 block">Driving Year(s)</label><input type="text" name="Driving Year" onChange={handleChange} value={form['Driving Year']} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="e.g. 2015-2020" /></div>
+
+                                <div><label className="text-xs text-gray-500 uppercase mb-1 block">Mileage (km)</label><input type="number" name="Mileage (est)" onChange={handleChange} value={form['Mileage (est)']} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white outline-none" /></div>
+                                <div><label className="text-xs text-gray-500 uppercase mb-1 block">Power (HP)</label><input type="number" name="Power" onChange={handleChange} value={form.Power} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white outline-none" /></div>
+                                
+                                <div>
+                                    <label className="text-xs text-gray-500 uppercase mb-1 block">Fuel</label>
+                                    <select name="Fuel" onChange={handleChange} value={form.Fuel} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white outline-none"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option></select>
+                                </div>
+                                
+                                <div>
+                                    <label className="text-xs text-gray-500 uppercase mb-1 block">Segment</label>
+                                    <select name="Segment" onChange={handleChange} value={form.Segment} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white outline-none"><option>Comfort</option><option>Luxury</option><option>Performance</option><option>Economy</option><option>Supercar</option><option>Hypercar</option><option>Sport</option></select>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-500 uppercase mb-1 block">Drive Type</label>
+                                    <select name="Drive" onChange={handleChange} value={form.Drive} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white outline-none"><option>FWD</option><option>RWD</option><option>AWD</option></select>
+                                </div>
+
+                                <div><label className="text-xs text-gray-500 uppercase mb-1 block">Country</label><input name="Country" onChange={handleChange} value={form.Country} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Turkey" /></div>
+
+                                <div className="col-span-2">
+                                    <label className="text-xs text-gray-500 uppercase mb-1 block">Custom Image URL (Optional)</label>
+                                    <input name="ImageUrl" onChange={handleChange} value={form.ImageUrl} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none mb-1" placeholder="https://..." />
+                                    <p className="text-[10px] text-gray-500 leading-tight">İpucu: Wikipedia bazen klasik arabaların yeni kasalarını gösterebilir. Bu alanı kullanarak istediğiniz aracın tam resmini yapıştırabilirsiniz.</p>
+                                </div>
+                            </div>
+                            
+                            <div className="pt-4 mt-2 flex gap-3 shrink-0">
+                                <button type="button" onClick={onClose} className="flex-1 py-3 bg-dark border border-border rounded-xl text-sm font-medium text-gray-300">Cancel</button>
+                                <button type="submit" className="flex-1 bg-accent hover:bg-accentHover text-white font-bold py-3 rounded-xl transition shadow-[0_0_15px_rgba(225,29,72,0.3)]">{initialData ? 'Update Car' : 'Save Car'}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // Modal - Generic Prompt
+        const PromptModal = ({ isOpen, title, desc, defaultValue, onClose, onSave }) => {
+            const [val, setVal] = React.useState(defaultValue);
+            if(!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm" onClick={onClose}>
+                    <div className="bg-card w-full max-w-sm rounded-3xl border border-border p-6" onClick={e=>e.stopPropagation()}>
+                        <h3 className="font-display font-bold text-xl text-white mb-2">{title}</h3>
+                        <p className="text-gray-400 text-sm mb-4">{desc}</p>
+                        <input autoFocus value={val} onChange={e=>setVal(e.target.value)} className="w-full bg-dark border border-border rounded-lg p-3 text-white outline-none focus:border-accent mb-4" />
+                        <button onClick={()=>{onSave(val); onClose();}} className="w-full bg-accent text-white font-bold py-3 rounded-xl">Save</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // Modal - Generic Confirm
+        const ConfirmModal = ({ isOpen, title, message, confirmText = "Yes", onClose, onConfirm }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm" onClick={onClose}>
+                    <div className="bg-card w-full max-w-sm rounded-3xl border border-border p-6 text-center" onClick={e=>e.stopPropagation()}>
+                        <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <IconTrash />
+                        </div>
+                        <h3 className="font-display font-bold text-xl text-white mb-2">{title}</h3>
+                        <p className="text-gray-400 text-sm mb-6">{message}</p>
+                        <div className="flex gap-3">
+                            <button onClick={onClose} className="flex-1 py-3 bg-dark border border-border rounded-xl text-sm font-medium text-gray-300 hover:text-white transition">Cancel</button>
+                            <button onClick={onConfirm} className="flex-1 bg-accent hover:bg-accentHover text-white font-bold py-3 rounded-xl transition shadow-[0_0_15px_rgba(225,29,72,0.3)]">{confirmText}</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW: AI Garage Analysis Modal Component ---
+        const AIGarageAnalysisModal = ({ isOpen, onClose, data }) => {
+            const [analysis, setAnalysis] = React.useState('');
+            const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+
+            React.useEffect(() => {
+                if (isOpen && data.length > 0 && !analysis) {
+                    runAnalysis();
+                }
+            }, [isOpen, data]);
+
+            const runAnalysis = async () => {
+                setIsAnalyzing(true);
+                const carList = data.map(c => `${c.Make} ${c.Model} (${c.Segment}, ${c.Power}HP)`).join(", ");
+                const prompt = `İşte benim sürdüğüm arabaların listesi: ${carList}. Lütfen bir otomotiv psikoloğu olarak garajımı analiz et. Benim nasıl bir sürücü karakterine sahip olduğumu eğlenceli, profesyonel ve hafif esprili bir dille (Türkçe) açıkla. Bana bir "Sürücü Unvanı" ver (örn: "Alman Mühendisliği Aşığı" veya "Performans Delisi"). 2 veya 3 paragraf olsun. Çıktıda * ve # gibi markdown işaretleri KULLANMA, temiz düz metin ver.`;
+                
+                const response = await callGemini(prompt, "Sen uzman bir otomobil profili analisti ve psikologsun. Kullanıcıların araba garajına bakarak onlara havalı bir analiz sunarsın.");
+                setAnalysis(response);
+                setIsAnalyzing(false);
+            };
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={onClose}>
+                    <div className="bg-gradient-to-br from-card to-dark w-full max-w-2xl rounded-3xl border border-purple-500/30 p-8 shadow-[0_0_50px_rgba(168,85,247,0.15)] relative" onClick={e=>e.stopPropagation()}>
+                        <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 bg-black/30 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
+                        <h3 className="font-display font-bold text-3xl text-white mb-2 flex items-center gap-3">
+                            <span className="text-purple-400">✨</span> AI Garaj Analizi
+                        </h3>
+                        <p className="text-gray-400 text-sm mb-6">Gemini yapay zekası sürüş geçmişinizi ve otomobil zevkinizi inceliyor...</p>
+                        
+                        <div className="bg-dark/80 border border-border rounded-2xl p-6 min-h-[200px] flex flex-col justify-center shadow-inner relative overflow-hidden">
+                            <div className="absolute -bottom-10 -right-10 text-9xl opacity-5 pointer-events-none">🧠</div>
+                            {isAnalyzing ? (
+                                <div className="text-center animate-pulse">
+                                    <div className="text-5xl mb-4">🔮</div>
+                                    <div className="text-purple-400 font-bold tracking-widest uppercase text-sm">Profiliniz Çözümleniyor...</div>
+                                </div>
+                            ) : (
+                                <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line relative z-10">
+                                    {analysis}
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="mt-6 flex justify-end">
+                            <button onClick={onClose} className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-full font-bold transition shadow-[0_0_15px_rgba(147,51,234,0.4)]">
+                                Tamam
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW: News Ticker Component (RELIABLE INTERNAL POOL) ---
+        const NewsTicker = ({ refreshTrigger }) => {
+            const [newsItems, setNewsItems] = React.useState([]);
+
+            // Genişletilmiş gerçekçi otomotiv haber havuzu (Yenilendikçe içinden rastgele seçilecek)
+            const allNewsPool = [
+                "📰 F1 2026 Season kicks off in Bahrain with the new engine regulations shaking up the grid.",
+                "📰 Ferrari unveils their first fully electric hypercar, breaking internet search records.",
+                "📰 Solid-state battery mass production officially begins at Toyota's new mega-factory.",
+                "📰 Aston Martin's new Valkyrie AMR Pro shatters the Nürburgring Nordschleife lap record.",
+                "📰 Tesla announces the long-awaited Roadster deliveries will begin this summer.",
+                "📰 WRC Safari Rally Kenya preparations are underway for next week's grueling stages.",
+                "📰 Porsche synthetic fuel (eFuel) production reaches 100 million liters annually.",
+                "📰 Euro 7 emission standards officially implemented across all new European vehicles.",
+                "📰 Ford confirms the return of the legendary Capri as a high-performance EV crossover.",
+                "📰 Honda and Nissan announce a massive joint venture for next-gen autonomous driving software.",
+                "📰 Audi officially enters Formula 1 as a works team, revealing their 2026 challenger.",
+                "📰 Global EV sales surpass traditional combustion engine vehicles for the first time in Q1."
+            ];
+
+            React.useEffect(() => {
+                // Her yenilemede haberleri karıştır ve 5 tanesini seç
+                const shuffled = [...allNewsPool].sort(() => 0.5 - Math.random());
+                setNewsItems(shuffled.slice(0, 5));
+            }, [refreshTrigger]); 
+            
+            const scrollingText = [...newsItems, ...newsItems, ...newsItems].map((text, idx) => (
+                <span key={idx} className="mx-8 font-medium">{text}</span>
+            ));
+
+            return (
+                <div className="w-full bg-accent/10 border-b border-accent/20 overflow-hidden relative flex items-center h-10">
+                    <div className="absolute left-0 bg-accent text-white px-4 md:px-6 h-full flex items-center font-bold text-[10px] md:text-xs uppercase tracking-widest z-10 shadow-[10px_0_20px_rgba(0,0,0,0.5)]">
+                        <IconTrending /> <span className="ml-2 hidden sm:inline">Auto News</span>
+                    </div>
+                    <div className="flex whitespace-nowrap animate-marquee items-center text-xs md:text-sm text-gray-300 ml-24 md:ml-36 cursor-default">
+                        {scrollingText}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW: Upcoming Games Component ---
+        const UpcomingGames = () => {
+            const games = [
+                { title: "Assetto Corsa Evo", date: "May 2026 (Beta out now)", platform: "PC, PS5, Xbox Series X|S", genre: "Sim Racing", color: "text-red-400", border: "border-red-500/30" },
+                { title: "F1 26", date: "June 2026", platform: "PC, PS5, Xbox", genre: "Motorsport", color: "text-yellow-400", border: "border-yellow-500/30" },
+                { title: "Forza Horizon 6", date: "Fall 2026 (Japan Rumors)", platform: "Xbox Series X|S, PC", genre: "Open World Arcade", color: "text-pink-400", border: "border-pink-500/30" },
+                { title: "WRC 26", date: "November 2026", platform: "PC, PS5, Xbox", genre: "Rally Simulation", color: "text-blue-400", border: "border-blue-500/30" },
+                { title: "Need for Speed: Underground 3", date: "Holiday 2026", platform: "PS5, Xbox, PC", genre: "Street Racing", color: "text-green-400", border: "border-green-500/30" }
+            ];
+
+            return (
+                <div className="py-12 border-t border-border mt-8">
+                    <h3 className="font-display font-bold text-2xl mb-6 flex items-center gap-3">
+                        <span className="text-purple-500"><IconGamepad /></span> Upcoming Racing Games
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {games.map((game, i) => (
+                            <div key={i} className={`bg-dark border ${game.border} rounded-2xl p-5 relative overflow-hidden group hover:border-purple-500/50 transition-all shadow-sm`}>
+                                <div className="absolute -top-4 -right-4 text-7xl opacity-5 group-hover:scale-110 transition-transform">🏎️</div>
+                                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">{game.genre}</div>
+                                <h4 className="text-xl font-display font-bold text-white mb-3">{game.title}</h4>
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-gray-500"></span> Platform: <span className="text-gray-200">{game.platform}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs font-medium">
+                                        <span className={`w-1.5 h-1.5 rounded-full bg-current ${game.color}`}></span> Release: <span className={game.color}>{game.date}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW: Engine Wars Infographic Component ---
+        const EngineWars = () => {
+            const stats = [
+                { id: 'ice', label: 'ICE', desc: 'Internal Combustion', percentage: 48, color: 'bg-orange-500', textCol: 'text-orange-500', fromCol: 'from-orange-500/20', borderCol: 'border-orange-500/30', glow: 'shadow-[0_0_15px_rgba(249,115,22,0.5)]', icon: '⛽' },
+                { id: 'hev', label: 'HEV', desc: 'Hybrid Electric', percentage: 18, color: 'bg-blue-500', textCol: 'text-blue-500', fromCol: 'from-blue-500/20', borderCol: 'border-blue-500/30', glow: 'shadow-[0_0_15px_rgba(59,130,246,0.5)]', icon: '🔋' },
+                { id: 'phev', label: 'PHEV', desc: 'Plug-in Hybrid', percentage: 10, color: 'bg-purple-500', textCol: 'text-purple-500', fromCol: 'from-purple-500/20', borderCol: 'border-purple-500/30', glow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]', icon: '🔌' },
+                { id: 'bev', label: 'BEV', desc: 'Battery Electric', percentage: 24, color: 'bg-green-500', textCol: 'text-green-500', fromCol: 'from-green-500/20', borderCol: 'border-green-500/30', glow: 'shadow-[0_0_15px_rgba(34,197,94,0.5)]', icon: '⚡' },
+            ];
+
+            return (
+                <div className="py-12 border-t border-border mt-8 relative">
+                    {/* Background decorative elements */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-orange-500/5 via-purple-500/5 to-green-500/5 blur-3xl rounded-full pointer-events-none z-0"></div>
+
+                    <div className="relative z-10">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                            <div>
+                                <h3 className="font-display font-bold text-3xl flex items-center gap-4 text-white">
+                                    <span className="p-2.5 bg-dark rounded-xl border border-border shadow-lg">⚔️</span> 
+                                    Engine Wars: Global Shift
+                                </h3>
+                                <p className="text-gray-400 text-sm mt-3 max-w-xl leading-relaxed">
+                                    The transition is accelerating. Here is the latest Q1 2026 global new car market share by powertrain type, reflecting the rapid adoption of electrified vehicles.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Premium Segmented Bar */}
+                        <div className="w-full h-12 bg-dark/60 p-1.5 rounded-2xl flex gap-1.5 mb-10 border border-white/5 shadow-inner backdrop-blur-md">
+                            {stats.map(stat => (
+                                <div 
+                                    key={stat.id} 
+                                    className={`h-full rounded-xl ${stat.color} relative group cursor-pointer transition-all duration-500 hover:brightness-125 ${stat.glow}`} 
+                                    style={{ width: `${stat.percentage}%` }}
+                                >
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm bg-black/20 rounded-xl">
+                                        <span className="text-xs font-black text-white drop-shadow-md tracking-widest">{stat.label} {stat.percentage}%</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Enhanced Cards */}
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                            {stats.map(stat => (
+                                <div key={stat.id} className={`bg-gradient-to-b ${stat.fromCol} to-card border ${stat.borderCol} rounded-3xl p-6 relative overflow-hidden group hover:-translate-y-2 transition-all duration-300 shadow-lg hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]`}>
+                                    <div className="absolute -bottom-6 -right-4 text-8xl opacity-[0.03] group-hover:scale-110 group-hover:opacity-10 group-hover:-rotate-12 transition-all duration-500">{stat.icon}</div>
+                                    
+                                    <div className="flex flex-col h-full relative z-10">
+                                        <div className="flex justify-between items-start mb-8">
+                                            <div className={`w-14 h-14 rounded-2xl bg-dark/80 backdrop-blur-md ${stat.textCol} flex items-center justify-center text-3xl shadow-lg border border-white/5 group-hover:scale-110 transition-transform duration-300`}>
+                                                {stat.icon}
+                                            </div>
+                                            <div className={`text-4xl font-display font-black ${stat.textCol} tracking-tighter drop-shadow-lg`}>
+                                                {stat.percentage}<span className="text-xl opacity-70">%</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="mt-auto pt-4 border-t border-white/5">
+                                            <h4 className="text-white font-bold text-xl mb-1">{stat.label}</h4>
+                                            <p className="text-sm text-gray-400 font-medium leading-snug">{stat.desc}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW: Events Calendar Component ---
+        const EventsCalendar = () => {
+            const [filter, setFilter] = React.useState('Top 10');
+
+            const events = [
+                { title: "WRC Safari Rally Kenya", date: "Mar 26 - 29, 2026", month: 3, type: "Motorsport", isTop10: true, location: "Naivasha, Kenya", price: "From $50" },
+                { title: "New York International Auto Show", date: "Apr 3 - 12, 2026", month: 4, type: "Auto Show", isTop10: false, location: "New York, USA", price: "$22" },
+                { title: "WRC Croatia Rally", date: "Apr 23 - 26, 2026", month: 4, type: "Motorsport", isTop10: false, location: "Zagreb, Croatia", price: "From €30" },
+                { title: "Formula 1 Miami Grand Prix", date: "May 1 - 3, 2026", month: 5, type: "Motorsport", isTop10: true, location: "Miami, USA", price: "From $600" },
+                { title: "Formula 1 Monaco Grand Prix", date: "May 21 - 24, 2026", month: 5, type: "Motorsport", isTop10: true, location: "Monte Carlo, Monaco", price: "From €150" },
+                { title: "Indianapolis 500", date: "May 24, 2026", month: 5, type: "Motorsport", isTop10: true, location: "Indiana, USA", price: "From $65" },
+                { title: "Nürburgring 24 Hours", date: "Jun 4 - 7, 2026", month: 6, type: "Motorsport", isTop10: false, location: "Nürburg, Germany", price: "From €35" },
+                { title: "24 Hours of Le Mans", date: "Jun 13 - 14, 2026", month: 6, type: "Motorsport", isTop10: true, location: "Le Mans, France", price: "From €94" },
+                { title: "Pikes Peak Hill Climb", date: "Jun 28, 2026", month: 6, type: "Motorsport", isTop10: false, location: "Colorado, USA", price: "From $75" },
+                { title: "Goodwood Festival of Speed", date: "Jul 9 - 12, 2026", month: 7, type: "Festival", isTop10: true, location: "West Sussex, UK", price: "From £60" },
+                { title: "WRC Rally Finland", date: "Jul 30 - Aug 2, 2026", month: 8, type: "Motorsport", isTop10: false, location: "Jyväskylä, Finland", price: "From €85" },
+                { title: "Monterey Car Week", date: "Aug 14 - 23, 2026", month: 8, type: "Auto Show", isTop10: true, location: "California, USA", price: "Varies ($50 - $500+)" },
+                { title: "IAA Mobility Munich", date: "Sep 8 - 13, 2026", month: 9, type: "Auto Show", isTop10: true, location: "Munich, Germany", price: "From €25" },
+                { title: "Goodwood Revival", date: "Sep 11 - 13, 2026", month: 9, type: "Festival", isTop10: false, location: "West Sussex, UK", price: "From £75" },
+                { title: "Paris Motor Show", date: "Oct 12 - 18, 2026", month: 10, type: "Auto Show", isTop10: false, location: "Paris, France", price: "From €16" },
+                { title: "SEMA Show Las Vegas", date: "Nov 3 - 6, 2026", month: 11, type: "Auto Show", isTop10: true, location: "Nevada, USA", price: "Trade Only" },
+                { title: "F1 Las Vegas Grand Prix", date: "Nov 19 - 21, 2026", month: 11, type: "Motorsport", isTop10: false, location: "Nevada, USA", price: "From $500" },
+                { title: "F1 Abu Dhabi Finale", date: "Dec 4 - 6, 2026", month: 12, type: "Motorsport", isTop10: false, location: "Yas Island, UAE", price: "From AED 999" },
+            ];
+
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            
+            const filteredEvents = filter === 'Top 10' 
+                ? events.filter(e => e.isTop10).slice(0, 10)
+                : events.filter(e => e.month === parseInt(filter)).sort((a,b) => a.month - b.month);
+
+            return (
+                <div className="py-12 border-t border-border mt-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                        <h3 className="font-display font-bold text-2xl flex items-center gap-3">
+                            <span className="text-accent"><IconCalendar /></span> 2026 Events Calendar
+                        </h3>
+                        
+                        {/* Filters */}
+                        <div className="flex overflow-x-auto gap-2 pb-2 md:pb-0 scrollbar-hide">
+                            <button 
+                                onClick={() => setFilter('Top 10')}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${filter === 'Top 10' ? 'bg-accent text-white' : 'bg-dark border border-border text-gray-400 hover:text-white'}`}
+                            >
+                                🏆 Top 10
+                            </button>
+                            {months.map((m, idx) => {
+                                const monthNum = idx + 1;
+                                const hasEvents = events.some(e => e.month === monthNum);
+                                return (
+                                    <button 
+                                        key={m}
+                                        onClick={() => setFilter(monthNum.toString())}
+                                        className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${filter === monthNum.toString() ? 'bg-white text-dark' : 'bg-dark border border-border text-gray-400 hover:text-white'} ${!hasEvents ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                        disabled={!hasEvents}
+                                    >
+                                        {m}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {filteredEvents.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {filteredEvents.map((evt, i) => (
+                                <div key={i} className="bg-card border border-border rounded-2xl overflow-hidden group hover:border-accent transition-all shadow-sm flex flex-col relative h-full">
+                                    {/* Abstract Pattern Header */}
+                                    <div className="h-16 bg-gradient-to-r from-dark to-card border-b border-border/50 relative overflow-hidden flex items-center px-5">
+                                        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }}></div>
+                                        <span className="bg-dark/80 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase text-white px-2.5 py-1 rounded border border-border/50 z-10">
+                                            {evt.type}
+                                        </span>
+                                    </div>
+                                    <div className="p-5 flex-1 flex flex-col">
+                                        <h4 className="text-white font-bold text-lg mb-4 leading-tight">{evt.title}</h4>
+                                        <div className="mt-auto space-y-3">
+                                            <div className="flex items-start gap-2 text-xs text-gray-400">
+                                                <span className="mt-0.5 text-gray-500"><IconLocation /></span>
+                                                <span>{evt.location}</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-gray-400">
+                                                <span className="mt-0.5 text-gray-500"><IconCalendar /></span>
+                                                <span className="text-accent font-medium">{evt.date}</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-gray-400 pt-3 border-t border-border/50">
+                                                <span className="mt-0.5 text-gray-500"><IconTicket /></span>
+                                                <span className="text-gray-200 font-medium">Est. Price: {evt.price}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10 bg-card border border-border rounded-2xl">
+                            <p className="text-gray-500">No major events found for this month.</p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- NEW: Daily Vote Modal ---
+        const DailyVoteModal = ({ isOpen, onClose }) => {
+            const [rating, setRating] = React.useState(0);
+            const [hoverRating, setHoverRating] = React.useState(0);
+            const [voted, setVoted] = React.useState(false);
+            const [carImg, setCarImg] = React.useState('');
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            let hash = 0;
+            for (let i = 0; i < todayStr.length; i++) hash = todayStr.charCodeAt(i) + ((hash << 5) - hash);
+            const carIndex = Math.abs(hash) % localCarDB.length;
+            const dailyCar = localCarDB[carIndex];
+
+            React.useEffect(() => {
+                const savedVote = localStorage.getItem(`carbio_daily_vote_${todayStr}`);
+                if (savedVote) {
+                    setRating(Number(savedVote));
+                    setVoted(true);
+                } else {
+                    setRating(0);
+                    setVoted(false);
+                }
+            }, [isOpen, todayStr]);
+
+            React.useEffect(() => {
+                if (!isOpen || !dailyCar) return;
+                
+                setCarImg('');
+                const queryBrandModel = encodeURIComponent(`${dailyCar.Make} ${dailyCar.Model}`);
+                
+                fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${queryBrandModel}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=800&origin=*`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const pages = data.query?.pages;
+                        if (pages && Object.keys(pages)[0] !== "-1" && Object.values(pages)[0].thumbnail) {
+                            setCarImg(Object.values(pages)[0].thumbnail.source);
+                        }
+                    }).catch(() => {});
+            }, [isOpen, dailyCar]);
+
+            if (!isOpen) return null;
+
+            const handleVote = (val) => {
+                if (voted) return;
+                setRating(val);
+                setVoted(true);
+                localStorage.setItem(`carbio_daily_vote_${todayStr}`, val.toString());
+            };
+
+            const fallbackImg = "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=800";
+
+            return (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={onClose}>
+                    <div className="bg-card w-full max-w-md rounded-3xl border border-border text-center relative overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.1)] flex flex-col" onClick={e=>e.stopPropagation()}>
+                        
+                        {/* Header Image Area */}
+                        <div className="h-48 w-full relative bg-dark shrink-0">
+                            <img src={carImg || fallbackImg} className="w-full h-full object-cover opacity-60 mix-blend-luminosity" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
+                            <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 bg-black/50 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
+                        </div>
+                        
+                        <div className="px-8 pb-8 relative -mt-8 z-10 flex-1 flex flex-col">
+                            <div className="w-16 h-16 bg-gradient-to-br from-accent to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg border-4 border-card relative z-20">
+                                <IconVote />
+                            </div>
+                            
+                            <h3 className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Car of the Day</h3>
+                            <h2 className="text-3xl font-display font-bold text-white mb-1">{dailyCar.Make}</h2>
+                            <h3 className="text-xl font-light text-gray-300 mb-6">{dailyCar.Model} <span className="text-accent font-bold">({dailyCar.Power} HP)</span></h3>
+                            
+                            <div className="bg-dark border border-border rounded-xl p-3 mb-8 text-sm text-gray-400 flex justify-center gap-3 mx-auto flex-wrap w-full">
+                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Engine > 0 ? `${dailyCar.Engine}L ` : ''}{dailyCar.Fuel}</span>
+                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Transmission}</span>
+                                <span className="bg-card px-2 py-1 rounded border border-border/50">{dailyCar.Drive}</span>
+                            </div>
+
+                            <div className="mt-auto">
+                                {voted ? (
+                                    <div className="animate-fade-in bg-green-500/10 border border-green-500/20 p-4 rounded-2xl">
+                                        <p className="text-green-400 font-bold mb-3 text-sm">Thanks for voting today!</p>
+                                        <div className="flex justify-center gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <svg key={star} width="20" height="20" viewBox="0 0 24 24" fill={star <= rating ? "#E11D48" : "none"} stroke={star <= rating ? "#E11D48" : "#4B5563"} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                            ))}
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 mt-3 uppercase tracking-widest">Come back tomorrow</p>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="text-gray-300 mb-4 font-medium">Rate this car:</p>
+                                        <div className="flex justify-center gap-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button 
+                                                    key={star} 
+                                                    onMouseEnter={() => setHoverRating(star)} 
+                                                    onMouseLeave={() => setHoverRating(0)}
+                                                    onClick={() => handleVote(star)}
+                                                    className="transition-transform hover:scale-125 focus:outline-none"
+                                                >
+                                                    <svg width="36" height="36" viewBox="0 0 24 24" fill={(hoverRating || rating) >= star ? "#E11D48" : "none"} stroke={(hoverRating || rating) >= star ? "#E11D48" : "#4B5563"} strokeWidth="2" className="transition-colors duration-200 drop-shadow-md"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        const App = () => {
+            const loadData = () => { const saved = localStorage.getItem("carbio_data"); return saved ? JSON.parse(saved) : []; };
+            const loadProfile = () => localStorage.getItem("carbio_profile") || "Driver";
+
+            const [data, setData] = React.useState(loadData);
+            const [profileName, setProfileName] = React.useState(loadProfile);
+            
+            const [selectedCar, setSelectedCar] = React.useState(null);
+            const [editingCar, setEditingCar] = React.useState(null);
+            
+            const [shareOpen, setShareOpen] = React.useState(false);
+            const [addModalOpen, setAddModalOpen] = React.useState(false);
+            const [nameModalOpen, setNameModalOpen] = React.useState(false);
+            const [voteModalOpen, setVoteModalOpen] = React.useState(false);
+            const [aiAnalysisOpen, setAiAnalysisOpen] = React.useState(false);
+            const [confirmModalConfig, setConfirmModalConfig] = React.useState({ isOpen: false, title: '', message: '', onConfirm: null, confirmText: '' });
+
+            const [refreshCounter, setRefreshCounter] = React.useState(0);
+            const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+            const triggerRefresh = () => {
+                setIsRefreshing(true);
+                setTimeout(() => {
+                    setRefreshCounter(prev => prev + 1);
+                    setIsRefreshing(false);
+                }, 800);
+            };
+
+            React.useEffect(() => { localStorage.setItem("carbio_data", JSON.stringify(data)); }, [data]);
+            React.useEffect(() => { localStorage.setItem("carbio_profile", profileName); }, [profileName]);
+
+            const handleUpload = (e) => {
+                const file = e.target.files[0]; if(!file) return;
+                const reader = new FileReader();
+                if (file.name.endsWith('json')) {
+                    reader.onload = (evt) => { try { const jd = JSON.parse(evt.target.result); if(Array.isArray(jd)) setData(prev => [...jd, ...prev]); } catch(e){} };
+                    reader.readAsText(file);
+                } else {
+                    reader.onload = (evt) => { const wb = XLSX.read(new Uint8Array(evt.target.result), {type: 'array'}); const jd = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); setData(prev => [...jd.filter(r=>r.Make), ...prev]); };
+                    reader.readAsArrayBuffer(file);
+                }
+                e.target.value = null;
+            };
+
+            const openConfirm = (title, message, confirmText, onConfirm) => {
+                setConfirmModalConfig({ isOpen: true, title, message, confirmText, onConfirm });
+            };
+            const closeConfirm = () => setConfirmModalConfig(prev => ({ ...prev, isOpen: false }));
+
+            const handleReset = () => openConfirm('Are you sure?', 'This will permanently delete all your car data.', 'Yes, Reset', () => { setData([]); closeConfirm(); });
+
+            const totalDistance = data.reduce((s, c) => s + (Number(c['Mileage (est)']) || 0), 0);
+            const totalCO2 = data.reduce((s, c) => s + calculateCO2(c), 0);
+            const countries = new Set(data.map(c => c.Country).filter(Boolean));
+
+            return (
+                <div className="font-sans selection:bg-accent selection:text-white pb-20">
+                    <NewsTicker refreshTrigger={refreshCounter} />
+                    <HeroSection 
+                        profileName={profileName} onEditProfile={() => setNameModalOpen(true)}
+                        data={data} totalCars={data.length} totalDistance={totalDistance} totalCountries={countries.size} 
+                        yearsSpan={new Date().getFullYear() - 2004} 
+                        onUpload={handleUpload} onAdd={() => setAddModalOpen(true)}
+                        onShare={() => setShareOpen(true)} onReset={handleReset}
+                        onVoteClick={() => setVoteModalOpen(true)}
+                        onRefreshClick={triggerRefresh} isRefreshing={isRefreshing}
+                        onAnalyze={() => setAiAnalysisOpen(true)}
+                        onExport={()=>{
+                            const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+                            a.download = "Carbiography.json"; document.body.appendChild(a); a.click(); a.remove();
+                        }}
+                    />
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-8">
+                        {data.length > 0 ? (
+                            <>
+                                <DeepInsights data={data} totalCO2={totalCO2} totalDistance={totalDistance} />
+                                <Timeline data={data} onCarClick={setSelectedCar} />
+                                <CollectionGrid data={data} onCarClick={setSelectedCar} countryInfo={c => baseCountryData[c] || {flag:'📍', coords:null}} />
+                            </>
+                        ) : (
+                            <div className="py-16 md:py-24 text-center flex flex-col items-center max-w-2xl mx-auto">
+                                <div className="w-20 h-20 bg-dark border border-border rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(225,29,72,0.2)]">
+                                    <IconMagic />
+                                </div>
+                                <h2 className="text-3xl font-display font-bold text-white mb-4">Welcome to your Carbiography</h2>
+                                <p className="text-gray-400 mb-8 leading-relaxed">Start building your automotive timeline. You can add cars manually or let our AI fetch the specs for you.</p>
+
+                                <div className="bg-dark border border-border rounded-2xl p-6 mb-8 text-left w-full">
+                                    <h3 className="text-accent font-bold uppercase tracking-widest text-xs mb-4">How to add a car?</h3>
+                                    <ul className="space-y-4 text-sm text-gray-300">
+                                        <li className="flex gap-3 items-start">
+                                            <span className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shrink-0 font-bold text-white text-xs">1</span>
+                                            <div>Click the <b>Add Car</b> button below.</div>
+                                        </li>
+                                        <li className="flex gap-3 items-start">
+                                            <span className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center shrink-0 font-bold text-white text-xs">2</span>
+                                            <div>Enter the <b>Make</b> (e.g., BMW), <b>Model</b> (e.g., M3) and <b>Model Year</b> (e.g., 1990).</div>
+                                        </li>
+                                        <li className="flex gap-3 items-start">
+                                            <span className="w-6 h-6 rounded-full bg-accent text-white flex items-center justify-center shrink-0 font-bold text-xs shadow-[0_0_10px_rgba(225,29,72,0.5)]">3</span>
+                                            <div>Click <b>Fetch Specs</b>. We will automatically find the horsepower, engine, and drive type for you!</div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <button onClick={() => setAddModalOpen(true)} className="bg-accent hover:bg-accentHover text-white px-8 py-4 rounded-full font-bold transition flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(225,29,72,0.4)]">
+                                    <IconPlus /> Add Your First Car
+                                </button>
+                            </div>
+                        )}
+                        
+                        <UpcomingGames />
+                        <EngineWars />
+                        <EventsCalendar />
+                    </div>
+
+                    <DetailModal 
+                        car={selectedCar} 
+                        onClose={() => setSelectedCar(null)} 
+                        onEdit={() => { setEditingCar(selectedCar); setSelectedCar(null); }}
+                        onDelete={() => {
+                            openConfirm('Delete Car?', `Are you sure you want to permanently delete the ${selectedCar.Make} ${selectedCar.Model}?`, 'Yes, Delete', () => {
+                                setData(prev => prev.filter(c => c['#'] !== selectedCar['#']));
+                                setSelectedCar(null);
+                                closeConfirm();
+                            });
+                        }}
+                    />
+                    
+                    <ShareModal data={data} totalDistance={totalDistance} totalCO2={totalCO2} open={shareOpen} onClose={() => setShareOpen(false)} profileName={profileName} />
+                    
+                    <AddCarModal 
+                        isOpen={addModalOpen || !!editingCar} 
+                        initialData={editingCar}
+                        onClose={() => { setAddModalOpen(false); setEditingCar(null); }} 
+                        onSave={car => {
+                            if (editingCar) {
+                                setData(prev => prev.map(c => c['#'] === car['#'] ? car : c));
+                            } else {
+                                setData(prev => [car, ...prev]);
+                            }
+                            setAddModalOpen(false);
+                            setEditingCar(null);
+                        }} 
+                        existingData={data} 
+                    />
+                    
+                    <DailyVoteModal isOpen={voteModalOpen} onClose={() => setVoteModalOpen(false)} />
+                    
+                    <PromptModal isOpen={nameModalOpen} title="Profile Name" desc="Enter a name to display on your dashboard and share cards." defaultValue={profileName} onClose={()=>setNameModalOpen(false)} onSave={setProfileName} />
+                    
+                    <ConfirmModal 
+                        isOpen={confirmModalConfig.isOpen} 
+                        title={confirmModalConfig.title} 
+                        message={confirmModalConfig.message} 
+                        confirmText={confirmModalConfig.confirmText} 
+                        onClose={closeConfirm} 
+                        onConfirm={confirmModalConfig.onConfirm} 
+                    />
+
+                    <AIGarageAnalysisModal 
+                        isOpen={aiAnalysisOpen} 
+                        onClose={() => setAiAnalysisOpen(false)} 
+                        data={data} 
+                    />
+
+                    <footer className="max-w-7xl mx-auto px-4 sm:px-8 mt-16 pt-8 pb-12 border-t border-border text-center">
+                        <p className="text-gray-500 text-sm font-medium">
+                            Developed by <a href="https://www.linkedin.com/in/yigityuksel/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-accent transition-colors underline decoration-border hover:decoration-accent underline-offset-4 font-bold">Yigit Yuksel</a>
+                        </p>
+                        <a href="mailto:carbiography@gmail.com" className="text-gray-400 hover:text-accent transition-colors text-xs mt-2 inline-block">carbiography@gmail.com</a>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
