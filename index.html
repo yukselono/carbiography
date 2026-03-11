@@ -40,9 +40,6 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <!-- SheetJS for Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -56,15 +53,7 @@
         .timeline-scroll { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         .timeline-item { scroll-snap-align: start; }
         .timeline-line { position: absolute; top: 24px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #E11D48 0%, #2A2A2A 100%); z-index: 0; }
-        @keyframes pulse-accent {
-            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
-            70% { transform: scale(1.2); box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); }
-            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
-        }
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .animate-marquee { animation: marquee 35s linear infinite; }
         .animate-marquee:hover { animation-play-state: paused; }
         select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
@@ -105,44 +94,50 @@
             { Make: 'BMW', Model: '520i', Power: 170, Engine: 1.6, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
             { Make: 'BMW', Model: 'M3', MinYear: 1986, MaxYear: 1991, Power: 200, Engine: 2.3, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
             { Make: 'BMW', Model: 'M3', MinYear: 1992, MaxYear: 1999, Power: 286, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'BMW', Model: 'M3', MinYear: 2000, MaxYear: 2006, Power: 343, Engine: 3.2, Fuel: 'Petrol', Transmission: 'Manual', Drive: 'RWD', Segment: 'Performance' },
             { Make: 'Audi', Model: 'A3', Power: 150, Engine: 1.4, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
             { Make: 'Audi', Model: 'S3', Power: 300, Engine: 2.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
             { Make: 'Mercedes', Model: 'C200', Power: 184, Engine: 1.5, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
             { Make: 'Tesla', Model: 'Model 3', Power: 283, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Luxury' },
             { Make: 'Volkswagen', Model: 'Golf', Power: 110, Engine: 1.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
             { Make: 'Ford', Model: 'Mustang', Power: 450, Engine: 5.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'Toyota', Model: 'Corolla', Power: 122, Engine: 1.8, Fuel: 'Hybrid', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Economy' },
             { Make: 'Volvo', Model: 'XC40', Power: 252, Engine: 0, Fuel: 'Electric', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Luxury' },
             { Make: 'Aston Martin', Model: 'Vantage', Power: 503, Engine: 4.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'Porsche', Model: '911', Power: 450, Engine: 3.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Performance' },
-            { Make: 'Ferrari', Model: '458', Power: 570, Engine: 4.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' },
-            { Make: 'Bugatti', Model: 'Veyron', Power: 1001, Engine: 8.0, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'AWD', Segment: 'Hypercar' }
+            { Make: 'Ferrari', Model: '458', Power: 570, Engine: 4.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' }
         ];
 
-        // --- YIGIT'S DEMO CAR DATA (FROM PROVIDED CARBIOGRAPHY.MD / CSV) ---
+        // --- EXTENDED DEMO CAR DATA (From CSV) ---
         const myDemoData = [
-            { "#": 1, Make: "Ferrari", Model: "GTC4Lusso", "Driving Year": "2023", Power: 690, Engine: 6.3, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Supercar", Country: "Italy", Points: 9, Status: "Rental", "Mileage (est)": 800, Story: "İnanılmaz bir V12 senfonisi, İtalya yollarında unutulmaz bir deneyim." },
-            { "#": 2, Make: "Aston Martin", Model: "DB9", "Driving Year": "2015", Power: 547, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "İsveç'te buz üzerinde bir İngiliz asilzadesi." },
-            { "#": 3, Make: "Aston Martin", Model: "Vanquish", "Driving Year": "2015", Power: 577, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100 },
-            { "#": 4, Make: "Audi", Model: "S3", "Driving Year": "2017-2023", Power: 300, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Performance", Country: "Turkey", Points: 10, Status: "Owned", "Mileage (est)": 65000, Story: "Yıllarca kahrımı çeken, her yola gelen performans canavarı yol arkadaşım." },
-            { "#": 5, Make: "BYD", Model: "Seal", "Driving Year": "2025", Power: 231, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "RWD", Segment: "Sedan", Country: "Turkey", Points: 10, Status: "Owned", "Mileage (est)": 15000, Story: "Elektrik devrimine geçiş yaptığım mükemmel menzilli araç." },
-            { "#": 6, Make: "Volvo", Model: "XC40", "Driving Year": "2024", Power: 252, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Leasing", "Mileage (est)": 12000 },
-            { "#": 7, Make: "Ferrari", Model: "458 Spider", "Driving Year": "2014", Power: 570, Engine: 4.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Supercar", Country: "Italy", Points: 10, Status: "Rental", "Mileage (est)": 400, Story: "Üstü açık, atmosferik V8... Rüya gibi." },
-            { "#": 8, Make: "Toyota", Model: "RAV4", "Driving Year": "2023", Power: 306, Engine: 2.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 9, Status: "Rental", "Mileage (est)": 2500, Story: "Norveç'in zorlu kış şartlarında hiç üzmedi." },
-            { "#": 9, Make: "BMW", Model: "X1", "Driving Year": "2025", Power: 245, Engine: 1.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 8, Status: "Rental", "Mileage (est)": 1800 },
-            { "#": 10, Make: "Mercedes", Model: "S-class", "Driving Year": "2010", Power: 517, Engine: 5.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Test", "Mileage (est)": 50 },
-            { "#": 11, Make: "Ford", Model: "Fiesta", "Driving Year": "2016", Power: 200, Engine: 1.6, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 8, Status: "Test", "Mileage (est)": 300, Story: "Autobahn'da küçük ama inanılmaz keyifli bir hot hatch." },
-            { "#": 12, Make: "KGM", Model: "Torres EVX", "Driving Year": "2025", Power: 207, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "FWD", Segment: "SUV", Country: "Turkey", Points: 7, Status: "Friend", "Mileage (est)": 200 },
-            { "#": 13, Make: "Fiat", Model: "500", "Driving Year": "2018", Power: 69, Engine: 1.2, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 5, Status: "Rental", "Mileage (est)": 500 },
-            { "#": 14, Make: "Volvo", Model: "S60", "Driving Year": "2025", Power: 310, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Sedan", Country: "USA", Points: 7, Status: "Friend", "Mileage (est)": 600, Story: "Amerika'nın uzun otoyollarında konforlu sürüş." },
-            { "#": 15, Make: "Alfa Romeo", Model: "Giulietta", "Driving Year": "2012", Power: 170, Engine: 1.4, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 6, Status: "Test", "Mileage (est)": 10 }
+            { "#": 1, Make: "Alfa Romeo", Model: "Giulietta", "Model Year": "2012", "Driving Year": "2012", Power: 170, Engine: 1.4, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 6, Status: "Test", "Mileage (est)": 10, Story: "A quick test drive of this Italian beauty. The dynamic mode was surprisingly punchy." },
+            { "#": 2, Make: "Aston Martin", Model: "DB9", "Model Year": "2015", "Driving Year": "2015", Power: 547, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "Driving a British aristocrat on the frozen lakes of Sweden. An unforgettable V12 symphony." },
+            { "#": 3, Make: "Aston Martin", Model: "Vanquish", "Model Year": "2015", "Driving Year": "2015", Power: 577, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "Even more aggressive than the DB9. The carbon fiber details and the roar echoing through the snowy forests." },
+            { "#": 4, Make: "Aston Martin", Model: "Vantage V12", "Model Year": "2015", "Driving Year": "2015", Power: 517, Engine: 6.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Sweden", Points: 10, Status: "Test", "Mileage (est)": 100, Story: "The smallest chassis with the biggest engine. An absolute beast to handle on ice." },
+            { "#": 5, Make: "Audi", Model: "S3", "Model Year": "2017", "Driving Year": "2017-2023", Power: 300, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Performance", Country: "Turkey", Points: 10, Status: "Owned", "Mileage (est)": 65000, Story: "My reliable companion for years. The Quattro system never failed me, a true daily performance car." },
+            { "#": 6, Make: "Audi", Model: "Q7", "Model Year": "2016", "Driving Year": "2018", Power: 272, Engine: 3.0, Fuel: "Diesel", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "UK", Points: 8, Status: "Rental", "Mileage (est)": 500, Story: "Cruising through the Scottish Highlands. Extremely comfortable and commanding presence." },
+            { "#": 7, Make: "BMW", Model: "M3", "Model Year": "2018", "Driving Year": "2019", Power: 431, Engine: 3.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Performance", Country: "Germany", Points: 9, Status: "Test", "Mileage (est)": 50, Story: "Autobahn testing. The acceleration and stability at high speeds are mind-blowing." },
+            { "#": 8, Make: "BMW", Model: "X1", "Model Year": "2025", "Driving Year": "2025", Power: 245, Engine: 1.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 8, Status: "Rental", "Mileage (est)": 1800, Story: "Navigated the majestic fjords of Norway. The hybrid system was very efficient." },
+            { "#": 9, Make: "BYD", Model: "Seal", "Model Year": "2024", "Driving Year": "2024", Power: 313, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "RWD", Segment: "Luxury", Country: "Turkey", Points: 9, Status: "Owned", "Mileage (est)": 15000, Story: "My leap into the electric revolution. Impressive tech and great range." },
+            { "#": 10, Make: "Ferrari", Model: "458 Spider", "Model Year": "2014", "Driving Year": "2014", Power: 570, Engine: 4.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Supercar", Country: "Italy", Points: 10, Status: "Rental", "Mileage (est)": 400, Story: "Roof down, naturally aspirated V8 screaming in the Italian countryside. Pure magic." },
+            { "#": 11, Make: "Ferrari", Model: "GTC4Lusso", "Model Year": "2018", "Driving Year": "2023", Power: 690, Engine: 6.3, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Supercar", Country: "Italy", Points: 9, Status: "Rental", "Mileage (est)": 800, Story: "A practical Ferrari? Yes. But when you step on the gas, the V12 reminds you what it really is." },
+            { "#": 12, Make: "Fiat", Model: "500", "Model Year": "2018", "Driving Year": "2018", Power: 69, Engine: 1.2, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 5, Status: "Rental", "Mileage (est)": 500, Story: "Small, practical, and perfect for tight city streets." },
+            { "#": 13, Make: "Ford", Model: "Fiesta", "Model Year": "2016", "Driving Year": "2016", Power: 100, Engine: 1.0, Fuel: "Petrol", Transmission: "Manual", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 7, Status: "Rental", "Mileage (est)": 300, Story: "A surprisingly fun little car with a brilliant chassis." },
+            { "#": 14, Make: "Mercedes", Model: "S-Class", "Model Year": "2010", "Driving Year": "2010", Power: 517, Engine: 5.5, Fuel: "Petrol", Transmission: "Automatic", Drive: "RWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Test", "Mileage (est)": 50, Story: "Like floating on a cloud. The ultimate luxury benchmark." },
+            { "#": 15, Make: "Toyota", Model: "RAV4", "Model Year": "2023", "Driving Year": "2023", Power: 306, Engine: 2.5, Fuel: "Hybrid", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 9, Status: "Rental", "Mileage (est)": 2500, Story: "Conquered the harsh Norwegian winter without a single issue." },
+            { "#": 16, Make: "Volkswagen", Model: "Golf TDI", "Model Year": "2012", "Driving Year": "2015", Power: 105, Engine: 1.6, Fuel: "Diesel", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "UK", Points: 6, Status: "Rental", "Mileage (est)": 2000, Story: "The standard metric for a hatchback. Drove all over the UK." },
+            { "#": 17, Make: "Volkswagen", Model: "Tiguan", "Model Year": "2015", "Driving Year": "2016", Power: 150, Engine: 2.0, Fuel: "Diesel", Transmission: "Automatic", Drive: "AWD", Segment: "SUV", Country: "Norway", Points: 7, Status: "Rental", "Mileage (est)": 1500, Story: "A solid, dependable SUV for a road trip." },
+            { "#": 18, Make: "Volkswagen", Model: "Polo", "Model Year": "2020", "Driving Year": "2021", Power: 90, Engine: 1.6, Fuel: "Diesel", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 5, Status: "Friend", "Mileage (est)": 250, Story: "Economical and practical for daily errands." },
+            { "#": 19, Make: "Volkswagen", Model: "Caravelle", "Model Year": "2012", "Driving Year": "2014", Power: 180, Engine: 2.0, Fuel: "Diesel", Transmission: "Manual", Drive: "FWD", Segment: "Minivan", Country: "Turkey", Points: 6, Status: "Friend", "Mileage (est)": 100, Story: "Great for a large group trip, lots of space and torque." },
+            { "#": 20, Make: "Volkswagen", Model: "T-Cross", "Model Year": "2024", "Driving Year": "2024", Power: 115, Engine: 1.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Turkey", Points: 6, Status: "Rental", "Mileage (est)": 2000, Story: "Compact crossover that did the job perfectly." },
+            { "#": 21, Make: "Volkswagen", Model: "Up!", "Model Year": "2025", "Driving Year": "2025", Power: 90, Engine: 1.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "FWD", Segment: "Economy", Country: "Germany", Points: 6, Status: "Rental", "Mileage (est)": 300, Story: "The ultimate city runabout." },
+            { "#": 22, Make: "Volvo", Model: "XC40", "Model Year": "2024", "Driving Year": "2024", Power: 252, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "Turkey", Points: 8, Status: "Leasing", "Mileage (est)": 12000, Story: "Safe, minimalistic, and a very smooth electric drive." },
+            { "#": 23, Make: "Volvo", Model: "S60", "Model Year": "2025", "Driving Year": "2025", Power: 310, Engine: 2.0, Fuel: "Petrol", Transmission: "Automatic", Drive: "AWD", Segment: "Luxury", Country: "USA", Points: 7, Status: "Friend", "Mileage (est)": 600, Story: "A highly comfortable cruiser for long American highways." },
+            { "#": 24, Make: "KGM", Model: "Torres EVX", "Model Year": "2025", "Driving Year": "2025", Power: 207, Engine: 0, Fuel: "Electric", Transmission: "Automatic", Drive: "FWD", Segment: "SUV", Country: "Turkey", Points: 7, Status: "Test", "Mileage (est)": 200, Story: "Interesting design and practical EV capability." }
         ];
 
         // --- AUTOMOTIVE CULTURAL INTELLIGENCE (GAMES, MOVIES, RARITY) ---
         const carCultureDB = {
             'ferrari458': { games: ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa', 'Need for Speed Rivals'], movies: ['Transformers: Dark of the Moon', 'The Counselor'], production: 6000, rarity: 'Ultra Rare' },
             'ferrari458spider': { games: ['Forza Horizon 5', 'The Crew 2'], movies: ['Fast & Furious 6 (Background)'], production: 4000, rarity: 'Ultra Rare' },
+            'ferrarigtc4lusso': { games: ['Forza Horizon 4', 'Gran Turismo Sport'], movies: [], production: 2500, rarity: 'Ultra Rare' },
             'astonmartindb9': { games: ['Need for Speed: Most Wanted', 'Test Drive Unlimited', 'Forza Motorsport'], movies: ['Casino Royale', 'Fast & Furious 6', 'Entourage'], production: 16500, rarity: 'Rare' },
             'astonmartinvanquish': { games: ['Need for Speed: Hot Pursuit', 'Gran Turismo 6'], movies: ['Die Another Day (007)'], production: 2500, rarity: 'Ultra Rare' },
             'porsche911': { games: ['Need for Speed: Porsche Unleashed', 'Gran Turismo 7', 'Real Racing 3'], movies: ['Bad Boys', 'Cars (Sally Carrera)', 'Gone in 60 Seconds'], production: 1100000, rarity: 'Rare' },
@@ -155,6 +150,7 @@
             'lamborghinihuracan': { games: ['Forza Horizon 5', 'Asphalt 9', 'The Crew 2'], movies: ['Doctor Strange'], production: 20000, rarity: 'Ultra Rare' },
             'bugattiveyron': { games: ['Need for Speed: Hot Pursuit', 'Forza Motorsport', 'Gran Turismo PSP'], movies: ['Transformers: Age of Extinction', 'Need for Speed'], production: 450, rarity: 'Legendary' },
             'vwgolf': { games: ['Gran Turismo 7', 'Forza Horizon 5', 'Need for Speed'], movies: ['The Fast and the Furious', 'Hot Fuzz'], production: 35000000, rarity: 'Common' },
+            'vwtiguan': { games: ['Farming Simulator (Mods)'], movies: ['Various Background'], production: 6000000, rarity: 'Common' },
             'toyotacorolla': { games: ['Gran Turismo 7'], movies: [], production: 50000000, rarity: 'Common' },
             'bmw320i': { games: ['Need for Speed: Most Wanted', 'Gran Turismo'], movies: ['Mission: Impossible - Rogue Nation'], production: 3000000, rarity: 'Common' },
             'teslamodel3': { games: ['PUBG Mobile', 'Gran Turismo 7'], movies: ['Leave the World Behind'], production: 2000000, rarity: 'Uncommon' },
@@ -215,16 +211,35 @@
         };
 
         // --- GEMINI API INTEGRATION (ROBUST ERROR HANDLING) ---
-        const callGemini = async (prompt, systemPrompt = "Sen uzman bir otomobil eleştirmeni ve yapay zeka asistanısın.") => {
-            const apiKey = "";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        // For local / GitHub Pages, we will ask user for an API key if the injected one is empty.
+        const callGemini = async (prompt, systemPrompt = "You are an expert automotive critic and AI assistant.") => {
+            // By default Canvas environment provides the key
+            const injectedKey = ""; 
+            let activeApiKey = injectedKey;
+
+            // Fallback for Github Pages or Local
+            if (!activeApiKey || activeApiKey === "") {
+                activeApiKey = localStorage.getItem('carbio_gemini_key') || "";
+                if (!activeApiKey || activeApiKey === "") {
+                    const userInput = window.prompt("To use AI features, please enter your free Google Gemini API Key:\n(Get it from https://aistudio.google.com/app/apikey)");
+                    if (userInput) {
+                        activeApiKey = userInput.trim();
+                        localStorage.setItem('carbio_gemini_key', activeApiKey);
+                    } else {
+                        throw new Error("API Key is required to use AI features.");
+                    }
+                }
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${activeApiKey}`;
             
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
 
-            const delays = [1000, 2000, 4000]; // Reduced delays so it fails faster if API key is empty/invalid
+            const delays = [1000, 2000, 4000, 8000, 16000]; // Exponential backoff rule
+            
             for (let i = 0; i <= delays.length; i++) {
                 try {
                     const response = await fetch(url, {
@@ -235,12 +250,16 @@
                     const data = await response.json();
                     
                     if (!response.ok) {
-                        throw new Error(data.error?.message || `API Hatası (${response.status})`);
+                        // If it's a key error, clear the localstorage so it asks again next time
+                        if (data.error?.message?.includes("API key not valid") || data.error?.message?.includes("unregistered")) {
+                            localStorage.removeItem('carbio_gemini_key');
+                        }
+                        throw new Error(data.error?.message || `API Error (${response.status})`);
                     }
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Görünüşe göre yapay zeka şu an cevap veremiyor.";
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "The AI is currently unable to respond.";
                 } catch (error) {
                     if (i === delays.length) {
-                        return `Yapay zeka servisine bağlanılamadı. Hata: ${error.message}. Lütfen daha sonra tekrar deneyin.`;
+                        throw new Error(`Failed to connect to the AI service. Error: ${error.message}`);
                     }
                     await new Promise(res => setTimeout(res, delays[i]));
                 }
@@ -281,13 +300,13 @@
         };
 
         const baseCountryData = {
-            'Turkey': { flag: '🇹🇷', coords: [38.9637, 35.2433] }, 'Sweden': { flag: '🇸🇪', coords: [60.1282, 18.6435] },
-            'Germany': { flag: '🇩🇪', coords: [51.1657, 10.4515] }, 'UK': { flag: '🇬🇧', coords: [55.3781, -3.4360] },
-            'Italy': { flag: '🇮🇹', coords: [41.8719, 12.5674] }, 'Norway': { flag: '🇳🇴', coords: [60.4720, 8.4689] },
-            'USA': { flag: '🇺🇸', coords: [37.0902, -95.7129] }, 'France': { flag: '🇫🇷', coords: [46.2276, 2.2137] },
-            'Japan': { flag: '🇯🇵', coords: [36.2048, 138.2529] }, 'Spain': { flag: '🇪🇸', coords: [40.4637, -3.7492] },
-            'Scotland': { flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', coords: [56.4907, -4.2026] }, 'Jordan': { flag: '🇯🇴', coords: [30.5852, 36.2384] },
-            'Greece': { flag: '🇬🇷', coords: [39.0742, 21.8243] }
+            'Turkey': { flag: '🇹🇷' }, 'Sweden': { flag: '🇸🇪' },
+            'Germany': { flag: '🇩🇪' }, 'UK': { flag: '🇬🇧' },
+            'Italy': { flag: '🇮🇹' }, 'Norway': { flag: '🇳🇴' },
+            'USA': { flag: '🇺🇸' }, 'France': { flag: '🇫🇷' },
+            'Japan': { flag: '🇯🇵' }, 'Spain': { flag: '🇪🇸' },
+            'Scotland': { flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' }, 'Jordan': { flag: '🇯🇴' },
+            'Greece': { flag: '🇬🇷' }
         };
 
         const getBrandDomain = (make) => {
@@ -324,7 +343,7 @@
         };
 
         // 1. Hero Section
-        const HeroSection = ({ profileName, onEditProfile, data, totalCars, totalDistance, totalCountries, yearsSpan, onShare, onUpload, onExport, onAdd, onReset, onVoteClick, onRefreshClick, isRefreshing, onAnalyze }) => {
+        const HeroSection = ({ profileName, onEditProfile, data, totalCars, onShare, onUpload, onExport, onAdd, onReset, onVoteClick, onRefreshClick, isRefreshing, onAnalyze }) => {
             const bgImages = [
                 "https://images.pexels.com/photos/3752194/pexels-photo-3752194.jpeg?auto=compress&cs=tinysrgb&w=1920",
                 "https://images.pexels.com/photos/3311574/pexels-photo-3311574.jpeg?auto=compress&cs=tinysrgb&w=1920",
@@ -426,22 +445,18 @@
         const DeepInsights = ({ data, totalCO2, totalDistance }) => {
             if(data.length === 0) return null;
             
-            // Mevcut Hesaplamalar
             const longestDrive = [...data].sort((a,b) => (Number(b['Mileage (est)'])||0) - (Number(a['Mileage (est)'])||0))[0];
             const maxPower = [...data].sort((a,b) => (Number(b.Power)||0) - (Number(a.Power)||0))[0];
             const treesOwed = Math.max(0, Math.round(totalCO2 / 21)); 
 
-            // YENİ: Marka Sadakati (En Çok Kullanılan Marka)
             const brandCounts = data.reduce((acc, car) => {
                 if(car.Make) acc[car.Make] = (acc[car.Make] || 0) + 1;
                 return acc;
             }, {});
             const topBrand = Object.keys(brandCounts).sort((a,b) => brandCounts[b] - brandCounts[a])[0];
 
-            // YENİ: Küresel Kaşif (Farklı Ülke Sayısı)
             const uniqueCountries = new Set(data.map(c => c.Country).filter(Boolean)).size;
 
-            // YENİ: Klasik Ruh (Kullanılan En Eski Model Yılına Sahip Araç)
             const oldestCar = [...data].sort((a,b) => {
                 const yearA = parseInt(a['Model Year'] || String(a['Driving Year']).split('-')[0]) || 9999;
                 const yearB = parseInt(b['Model Year'] || String(b['Driving Year']).split('-')[0]) || 9999;
@@ -528,7 +543,7 @@
                 if (!acc[y]) acc[y] = [];
                 acc[y].push(car); return acc;
             }, {});
-            const years = Object.keys(grouped).sort((a,b) => b - a); // Sort newest first
+            const years = Object.keys(grouped).sort((a,b) => b - a);
 
             return (
                 <div className="py-12 border-t border-border relative">
@@ -591,7 +606,7 @@
                         {/* Filters Sidebar */}
                         <div className="w-full lg:w-1/4 shrink-0">
                             <div className="sticky top-6 bg-card border border-border rounded-2xl p-6">
-                                <h3 className="font-display font-bold text-lg mb-6 tracking-widest uppercase text-gray-400">Filters (By Drive Year)</h3>
+                                <h3 className="font-display font-bold text-lg mb-6 tracking-widest uppercase text-gray-400">Filters</h3>
                                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
                                     <div><label className="block text-xs text-gray-500 uppercase mb-2">Brand</label><select value={filters.make} onChange={e=>setFilters({...filters, make: e.target.value})} className="w-full bg-dark border border-border text-white text-sm rounded-lg p-3 outline-none">{unique.makes.map(x=><option key={x} value={x}>{x}</option>)}</select></div>
                                     <div><label className="block text-xs text-gray-500 uppercase mb-2">Drive Year</label><select value={filters.year} onChange={e=>setFilters({...filters, year: e.target.value})} className="w-full bg-dark border border-border text-white text-sm rounded-lg p-3 outline-none">{unique.years.map(x=><option key={x} value={x}>{x}</option>)}</select></div>
@@ -649,7 +664,7 @@
                 if (car.ImageUrl) { setCarImage(car.ImageUrl); return; }
                 
                 setCarImage('');
-                setAiStory(''); // Reset story when car changes
+                setAiStory(''); 
                 const searchYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
                 const queryWithYear = encodeURIComponent(`${car.Make} ${car.Model} ${searchYear}`);
                 const queryBrandModel = encodeURIComponent(`${car.Make} ${car.Model}`);
@@ -678,12 +693,12 @@
                 setIsGeneratingStory(true);
                 try {
                     const targetYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
-                    const prompt = `Lütfen şu araç hakkında tutkulu, kısa ve etkileyici bir otomotiv dergisi incelemesi/hikayesi yaz (Türkçe): ${targetYear} ${car.Make} ${car.Model}. Bu araç ${car.Power} beygir gücünde, ${car.Engine}L motor hacmine sahip ve ${car.Transmission} vitesli bir ${car.Drive} araç. Kullanıcının bu araçla ilgili kişisel notu: "${car.Story || 'Yok'}". Bu notu da hikayeye yedir. En fazla 2 paragraf olsun. Yıldız (*) gibi markdown sembolleri KULLANMA. Düz metin ver.`;
+                    const prompt = `Please write a passionate, short, and engaging automotive magazine-style review/story about this car (in English): ${targetYear} ${car.Make} ${car.Model}. This car has ${car.Power} horsepower, a ${car.Engine}L engine, and a ${car.Drive} ${car.Transmission} drivetrain. The user's personal note about this car: "${car.Story || 'None'}". Integrate this personal note into the story naturally. Maximum 2 paragraphs. Do NOT use markdown symbols like asterisks (*). Provide clean text.`;
                     
-                    const response = await callGemini(prompt, "Sen dünyaca ünlü bir otomobil gazetecisisin. İnsanların arabalarla olan duygusal bağlarını anlatan etkileyici ve havalı metinler yazarsın.");
+                    const response = await callGemini(prompt, "You are a world-renowned automotive journalist. You write compelling and cool texts explaining people's emotional bonds with cars.");
                     setAiStory(response);
                 } catch (error) {
-                    setAiStory("Hikaye oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
+                    setAiStory(`An error occurred while generating the story:\n${error.message}`);
                 } finally {
                     setIsGeneratingStory(false);
                 }
@@ -694,7 +709,6 @@
             const targetYear = car['Model Year'] || String(car['Driving Year']).split('-')[0] || '';
             const ytSearchQuery = encodeURIComponent(`${car.Make} ${car.Model} ${targetYear} review`);
             
-            // Get Automotive Cultural Intelligence Data
             const cultureData = getCarCultureData(car.Make, car.Model, car.Power, car.Segment);
             
             const generatedReview = `The ${targetYear} ${car.Make} ${car.Model} offers a compelling driving experience. With its ${car.Engine}L engine delivering ${car.Power} horsepower, it stands out in the ${car.Segment || 'automotive'} segment. The ${String(car.Drive).toUpperCase() || 'standard'} drivetrain ensures solid handling. You drove this car in ${car['Driving Year'] || 'the past'} across a ${Number(car['Mileage (est)']).toLocaleString()} km journey.`;
@@ -752,14 +766,13 @@
                                 </div>
                             </div>
 
-                            {/* 💎 NEW: AUTOMOTIVE CULTURAL INTELLIGENCE 💎 */}
+                            {/* AUTOMOTIVE CULTURAL INTELLIGENCE */}
                             <div className="mb-8 border-t border-border pt-8">
                                 <h4 className="font-display font-bold text-xl mb-6 text-white flex items-center gap-2">
                                     <IconGlobe /> Automotive Cultural Intelligence
                                 </h4>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                     
-                                    {/* Rarity Card */}
                                     <div className="bg-dark border border-border rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
                                         <div className="absolute top-0 right-0 p-4 text-5xl opacity-5">💎</div>
                                         <div>
@@ -774,7 +787,6 @@
                                         </div>
                                     </div>
 
-                                    {/* Games Card */}
                                     <div className="bg-dark border border-border rounded-2xl p-5 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-4 text-5xl opacity-5">🎮</div>
                                         <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-4">VIDEO GAME APPEARANCES</div>
@@ -791,7 +803,6 @@
                                         )}
                                     </div>
 
-                                    {/* Movies Card */}
                                     <div className="bg-dark border border-border rounded-2xl p-5 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-4 text-5xl opacity-5">🎬</div>
                                         <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-4">MOVIE APPEARANCES</div>
@@ -816,7 +827,7 @@
                                     <div className="flex items-center justify-between mb-3">
                                         <h4 className="font-display font-bold text-lg text-white">Automotive Summary</h4>
                                         <button onClick={generateAiStory} disabled={isGeneratingStory} className="text-[10px] bg-accent/20 hover:bg-accent text-accent hover:text-white px-2 py-1 rounded transition flex items-center gap-1 font-bold border border-accent/30">
-                                            {isGeneratingStory ? '✨ Üretiliyor...' : '✨ AI Hikaye Yazdır'}
+                                            {isGeneratingStory ? '✨ Generating...' : '✨ Write AI Story'}
                                         </button>
                                     </div>
                                     <p className="text-sm text-gray-400 leading-relaxed bg-dark p-5 rounded-xl border border-border h-full whitespace-pre-line">
@@ -940,7 +951,7 @@
             );
         };
 
-        // Modal - Manual Data Entry (Add/Edit Car)
+        // Modal - Manual Data Entry
         const AddCarModal = ({ isOpen, onClose, onSave, existingData, initialData }) => {
             const [form, setForm] = React.useState({ Make: '', Model: '', 'Model Year': '', 'Driving Year': new Date().getFullYear().toString(), Power: '', Engine: '', Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'FWD', Segment: 'Comfort', 'Mileage (est)': '', Country: 'Turkey', Points: 5, Status: 'Owned', Story: '', ImageUrl: '' });
             const [isAutoFilling, setIsAutoFilling] = React.useState(false);
@@ -960,14 +971,13 @@
                 e.preventDefault();
                 if(!form.Make || !form.Model) return alert("Make and Model are required.");
                 
-                // Fallback logic for save if Model Year is left empty by user
                 const finalForm = { ...form };
                 if (!finalForm['Model Year']) {
                     finalForm['Model Year'] = String(finalForm['Driving Year']).split('-')[0].trim();
                 }
 
                 const newCar = { ...finalForm, Rating: "".repeat(Math.ceil(form.Points/2)) };
-                if (!newCar['#']) newCar['#'] = Date.now(); // assign unique ID if new
+                if (!newCar['#']) newCar['#'] = Date.now();
 
                 onSave(newCar);
             };
@@ -1044,7 +1054,7 @@
                                 
                                 <div>
                                     <label className="text-xs text-gray-500 uppercase mb-1 block">Segment</label>
-                                    <select name="Segment" onChange={handleChange} value={form.Segment} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white outline-none"><option>Comfort</option><option>Luxury</option><option>Performance</option><option>Economy</option><option>Supercar</option><option>Hypercar</option><option>Sport</option></select>
+                                    <select name="Segment" onChange={handleChange} value={form.Segment} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white outline-none"><option>Comfort</option><option>Luxury</option><option>Performance</option><option>Economy</option><option>Supercar</option><option>Hypercar</option><option>Sport</option><option>SUV</option></select>
                                 </div>
                                 <div>
                                     <label className="text-xs text-gray-500 uppercase mb-1 block">Drive Type</label>
@@ -1056,7 +1066,7 @@
                                 <div className="col-span-2">
                                     <label className="text-xs text-gray-500 uppercase mb-1 block">Custom Image URL (Optional)</label>
                                     <input name="ImageUrl" onChange={handleChange} value={form.ImageUrl} className="w-full bg-dark border border-border rounded-lg p-3 text-sm text-white focus:border-accent outline-none mb-1" placeholder="https://..." />
-                                    <p className="text-[10px] text-gray-500 leading-tight">İpucu: Wikipedia bazen klasik arabaların yeni kasalarını gösterebilir. Bu alanı kullanarak istediğiniz aracın tam resmini yapıştırabilirsiniz.</p>
+                                    <p className="text-[10px] text-gray-500 leading-tight">Hint: If the automatic Wikipedia fetch shows the wrong generation, paste an image link here.</p>
                                 </div>
                             </div>
                             
@@ -1070,7 +1080,6 @@
             );
         };
 
-        // Modal - Generic Prompt
         const PromptModal = ({ isOpen, title, desc, defaultValue, onClose, onSave }) => {
             const [val, setVal] = React.useState(defaultValue);
             if(!isOpen) return null;
@@ -1086,7 +1095,6 @@
             );
         };
 
-        // Modal - Generic Confirm
         const ConfirmModal = ({ isOpen, title, message, confirmText = "Yes", onClose, onConfirm }) => {
             if (!isOpen) return null;
             return (
@@ -1106,7 +1114,7 @@
             );
         };
 
-        // --- NEW: AI Garage Analysis Modal Component ---
+        // --- AI Garage Analysis Modal ---
         const AIGarageAnalysisModal = ({ isOpen, onClose, data }) => {
             const [analysis, setAnalysis] = React.useState('');
             const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -1121,12 +1129,12 @@
                 setIsAnalyzing(true);
                 try {
                     const carList = data.map(c => `${c.Make} ${c.Model} (${c.Segment}, ${c.Power}HP)`).join(", ");
-                    const prompt = `İşte benim sürdüğüm arabaların listesi: ${carList}. Lütfen bir otomotiv psikoloğu olarak garajımı analiz et. Benim nasıl bir sürücü karakterine sahip olduğumu eğlenceli, profesyonel ve hafif esprili bir dille (Türkçe) açıkla. Bana bir "Sürücü Unvanı" ver (örn: "Alman Mühendisliği Aşığı" veya "Performans Delisi"). 2 veya 3 paragraf olsun. Çıktıda * ve # gibi markdown işaretleri KULLANMA, temiz düz metin ver.`;
+                    const prompt = `Here is the list of cars I've driven: ${carList}. As an automotive psychologist, please analyze my garage. Explain what kind of driver I am in a fun, professional, and slightly humorous tone (in English). Give me a cool "Driver Title" (e.g. "Lover of German Engineering" or "Performance Maniac"). Keep it to 2 or 3 paragraphs. Do NOT use markdown symbols like * or # in the output, provide clean text.`;
                     
-                    const response = await callGemini(prompt, "Sen uzman bir otomobil profili analisti ve psikologsun. Kullanıcıların araba garajına bakarak onlara havalı bir analiz sunarsın.");
+                    const response = await callGemini(prompt, "You are an expert automotive profile analyst and psychologist. You look at a user's car history and provide a cool analysis.");
                     setAnalysis(response);
                 } catch (error) {
-                    setAnalysis("Analiz sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.");
+                    setAnalysis(`An unexpected error occurred during analysis:\n${error.message}`);
                 } finally {
                     setIsAnalyzing(false);
                 }
@@ -1139,17 +1147,17 @@
                     <div className="bg-gradient-to-br from-card to-dark w-full max-w-2xl rounded-3xl border border-purple-500/30 p-8 shadow-[0_0_50px_rgba(168,85,247,0.15)] relative" onClick={e=>e.stopPropagation()}>
                         <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 bg-black/30 border border-white/10 rounded-full backdrop-blur-md transition-all z-20"><IconX /></button>
                         <h3 className="font-display font-bold text-3xl text-white mb-2 flex items-center gap-3">
-                            <span className="text-purple-400">✨</span> AI Garaj Analizi
+                            <span className="text-purple-400">✨</span> AI Garage Analysis
                         </h3>
-                        <p className="text-gray-400 text-sm mb-6">Gemini yapay zekası sürüş geçmişinizi ve otomobil zevkinizi inceliyor...</p>
+                        <p className="text-gray-400 text-sm mb-6">Gemini AI is analyzing your driving history and automotive taste...</p>
                         
                         <div className="bg-dark/80 border border-border rounded-2xl p-6 min-h-[200px] flex flex-col justify-center shadow-inner relative overflow-hidden">
                             <div className="absolute -bottom-10 -right-10 text-9xl opacity-5 pointer-events-none">🧠</div>
                             {isAnalyzing ? (
                                 <div className="text-center animate-pulse">
                                     <div className="text-5xl mb-4">🔮</div>
-                                    <div className="text-purple-400 font-bold tracking-widest uppercase text-sm">Profiliniz Çözümleniyor...</div>
-                                    <div className="text-xs text-gray-500 mt-2">API'ye bağlanılıyor, bu işlem birkaç saniye sürebilir.</div>
+                                    <div className="text-purple-400 font-bold tracking-widest uppercase text-sm">Analyzing your profile...</div>
+                                    <div className="text-xs text-gray-500 mt-2">Connecting to API, this may take a few seconds.</div>
                                 </div>
                             ) : (
                                 <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line relative z-10">
@@ -1160,7 +1168,7 @@
                         
                         <div className="mt-6 flex justify-end">
                             <button onClick={onClose} className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-full font-bold transition shadow-[0_0_15px_rgba(147,51,234,0.4)]">
-                                Tamam
+                                Done
                             </button>
                         </div>
                     </div>
@@ -1168,10 +1176,8 @@
             );
         };
 
-        // --- NEW: News Ticker Component (RELIABLE INTERNAL POOL) ---
         const NewsTicker = ({ refreshTrigger }) => {
             const [newsItems, setNewsItems] = React.useState([]);
-
             const allNewsPool = [
                 "📰 F1 2026 Season kicks off in Bahrain with the new engine regulations shaking up the grid.",
                 "📰 Ferrari unveils their first fully electric hypercar, breaking internet search records.",
@@ -1208,7 +1214,6 @@
             );
         };
 
-        // --- NEW: Upcoming Games Component ---
         const UpcomingGames = () => {
             const games = [
                 { title: "Assetto Corsa Evo", date: "May 2026 (Beta out now)", platform: "PC, PS5, Xbox Series X|S", genre: "Sim Racing", color: "text-red-400", border: "border-red-500/30" },
@@ -1244,7 +1249,6 @@
             );
         };
 
-        // --- NEW: Engine Wars Infographic Component ---
         const EngineWars = () => {
             const stats = [
                 { id: 'ice', label: 'ICE', desc: 'Internal Combustion', percentage: 48, color: 'bg-orange-500', textCol: 'text-orange-500', fromCol: 'from-orange-500/20', borderCol: 'border-orange-500/30', glow: 'shadow-[0_0_15px_rgba(249,115,22,0.5)]', icon: '⛽' },
@@ -1312,7 +1316,6 @@
             );
         };
 
-        // --- NEW: Events Calendar Component ---
         const EventsCalendar = () => {
             const [filter, setFilter] = React.useState('Top 10');
 
@@ -1350,7 +1353,6 @@
                             <span className="text-accent"><IconCalendar /></span> 2026 Events Calendar
                         </h3>
                         
-                        {/* Filters */}
                         <div className="flex overflow-x-auto gap-2 pb-2 md:pb-0 scrollbar-hide">
                             <button 
                                 onClick={() => setFilter('Top 10')}
@@ -1379,7 +1381,6 @@
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {filteredEvents.map((evt, i) => (
                                 <div key={i} className="bg-card border border-border rounded-2xl overflow-hidden group hover:border-accent transition-all shadow-sm flex flex-col relative h-full">
-                                    {/* Abstract Pattern Header */}
                                     <div className="h-16 bg-gradient-to-r from-dark to-card border-b border-border/50 relative overflow-hidden flex items-center px-5">
                                         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }}></div>
                                         <span className="bg-dark/80 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase text-white px-2.5 py-1 rounded border border-border/50 z-10">
@@ -1415,7 +1416,6 @@
             );
         };
 
-        // --- NEW: Daily Vote Modal ---
         const DailyVoteModal = ({ isOpen, onClose }) => {
             const [rating, setRating] = React.useState(0);
             const [hoverRating, setHoverRating] = React.useState(0);
@@ -1471,7 +1471,6 @@
                 <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={onClose}>
                     <div className="bg-card w-full max-w-md rounded-3xl border border-border text-center relative overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.1)] flex flex-col" onClick={e=>e.stopPropagation()}>
                         
-                        {/* Header Image Area */}
                         <div className="h-48 w-full relative bg-dark shrink-0">
                             <img src={carImg || fallbackImg} className="w-full h-full object-cover opacity-60 mix-blend-luminosity" />
                             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent"></div>
@@ -1596,7 +1595,6 @@
                     <HeroSection 
                         profileName={profileName} onEditProfile={() => setNameModalOpen(true)}
                         data={data} totalCars={data.length} totalDistance={totalDistance} totalCountries={countries.size} 
-                        yearsSpan={new Date().getFullYear() - 2004} 
                         onUpload={handleUpload} onAdd={() => setAddModalOpen(true)}
                         onShare={() => setShareOpen(true)} onReset={handleReset}
                         onVoteClick={() => setVoteModalOpen(true)}
@@ -1613,7 +1611,7 @@
                             <>
                                 <DeepInsights data={data} totalCO2={totalCO2} totalDistance={totalDistance} />
                                 <Timeline data={data} onCarClick={setSelectedCar} />
-                                <CollectionGrid data={data} onCarClick={setSelectedCar} countryInfo={c => baseCountryData[c] || {flag:'📍', coords:null}} />
+                                <CollectionGrid data={data} onCarClick={setSelectedCar} countryInfo={c => baseCountryData[c] || {flag:'📍'}} />
                             </>
                         ) : (
                             <div className="py-16 md:py-24 text-center flex flex-col items-center max-w-2xl mx-auto animate-fade-in">
@@ -1649,7 +1647,7 @@
                                         <span className="text-purple-400 group-hover:scale-125 transition-transform"><IconMagic /></span> Try My Demo
                                     </button>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-4">"Try My Demo" loads a sample garage based on 15 amazing cars.</p>
+                                <p className="text-xs text-gray-500 mt-4">"Try My Demo" loads an extended sample garage based on an amazing collection of cars.</p>
                             </div>
                         )}
                         
@@ -1712,7 +1710,7 @@
                         <p className="text-gray-500 text-sm font-medium">
                             Developed by <a href="https://www.linkedin.com/in/yigityuksel/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-accent transition-colors underline decoration-border hover:decoration-accent underline-offset-4 font-bold">Yigit Yuksel</a>
                         </p>
-                        <a href="mailto:carbiography@gmail.com" className="text-gray-400 hover:text-accent transition-colors text-xs mt-2 inline-block">yuksel.ono@gmail.com</a>
+                        <a href="mailto:carbiography@gmail.com" className="text-gray-400 hover:text-accent transition-colors text-xs mt-2 inline-block">carbiography@gmail.com</a>
                     </footer>
                 </div>
             );
