@@ -85,7 +85,6 @@
         let app, auth, db;
         let isFirebaseEnabled = false;
         try {
-            // BURAYA KENDİ FIREBASE AYARLARINIZI GİREBİLİRSİNİZ (GitHub Pages için)
             const fallbackConfig = {
                 // apiKey: "AIzaSy...",
                 // authDomain: "proje-id.firebaseapp.com",
@@ -332,10 +331,6 @@
             'Greece': { flag: '🇬🇷' }
         };
 
-        const getBrandDomain = (make) => {
-            return `${String(make).toLowerCase().replace(/\s/g, '')}.com`;
-        };
-
         const getSegmentStyle = (seg) => {
             const s = String(seg).toLowerCase();
             if(s === 'performance' || s === 'supercar') return 'bg-red-500/10 text-red-500 border-red-500/20';
@@ -345,12 +340,16 @@
         };
 
         // --- COMPONENTS ---
-        const BrandLogo = ({ make, className = "w-10 h-10" }) => {
-            const logoUrl = `https://logo.clearbit.com/${getBrandDomain(make)}`;
-            const fallbackUrl = `https://ui-avatars.com/api/?name=${make}&background=1A1A1A&color=fff&bold=true`;
+        
+        // YENİ: Tipografi tabanlı harika Monogram Rozeti (Beyaz kutu sorununu çözer)
+        const BrandBadge = ({ make, className = "w-11 h-11", textSize = "text-xl" }) => {
+            const initial = make ? String(make).charAt(0).toUpperCase() : '?';
             return (
-                <div className={`${className} flex-shrink-0 flex items-center justify-center bg-white rounded-md p-1 shadow-sm overflow-hidden`}>
-                    <img src={logoUrl} alt={make} className="w-full h-full object-contain" onError={(e) => { e.target.onerror = null; e.target.src = fallbackUrl; }} />
+                <div className={`${className} flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#0F0F0F] border border-[#2A2A2A] rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] relative overflow-hidden group-hover:border-accent/50 transition-colors`}>
+                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_50%)]"></div>
+                    <span className={`font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 ${textSize} relative z-10 drop-shadow-md`}>
+                        {initial}
+                    </span>
                 </div>
             );
         };
@@ -489,7 +488,6 @@
             
             return (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                    {/* Card 1: Longest Drive */}
                     <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-blue-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]">
                         <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🛣️</div>
                         <div className="flex items-center gap-2 mb-2">
@@ -500,7 +498,6 @@
                         <div className="text-sm text-blue-400 mt-1 font-medium">{Number(longestDrive?.['Mileage (est)']||0).toLocaleString()} km</div>
                     </div>
 
-                    {/* Card 2: Carbon Debt */}
                     <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-green-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.1)]">
                         <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🌳</div>
                         <div className="flex items-center gap-2 mb-2">
@@ -511,7 +508,6 @@
                         <div className="text-sm text-gray-400 mt-1">Needed to offset {Math.round(totalCO2/1000)}t CO2</div>
                     </div>
 
-                    {/* Card 3: Highest Power */}
                     <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-accent/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(225,29,72,0.15)]">
                         <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🚀</div>
                         <div className="flex items-center gap-2 mb-2">
@@ -522,7 +518,6 @@
                         <div className="text-sm text-accent mt-1 font-medium">{maxPower?.Power} HP</div>
                     </div>
 
-                    {/* Card 4: Brand Loyalty */}
                     <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-yellow-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(234,179,8,0.1)]">
                         <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🏆</div>
                         <div className="flex items-center gap-2 mb-2">
@@ -533,7 +528,6 @@
                         <div className="text-sm text-yellow-500 mt-1 font-medium">Most driven manufacturer</div>
                     </div>
 
-                    {/* Card 5: Global Explorer */}
                     <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-teal-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(20,184,166,0.1)]">
                         <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🌍</div>
                         <div className="flex items-center gap-2 mb-2">
@@ -544,7 +538,6 @@
                         <div className="text-sm text-teal-400 mt-1 font-medium">International driving footprint</div>
                     </div>
 
-                    {/* Card 6: Vintage Soul */}
                     <div className="group bg-gradient-to-br from-card to-dark border border-border hover:border-orange-500/30 p-5 rounded-2xl relative overflow-hidden transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(249,115,22,0.1)]">
                         <div className="absolute -top-4 -right-2 text-7xl opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-transform duration-500">🕰️</div>
                         <div className="flex items-center gap-2 mb-2">
@@ -604,7 +597,7 @@
             );
         };
 
-        // 4. Grid
+        // 4. Grid (YENİ TASARIM)
         const CollectionGrid = ({ data, onCarClick }) => {
             const [filters, setFilters] = React.useState({ year: 'All', make: 'All', segment: 'All', fuel: 'All' });
             
@@ -648,27 +641,41 @@
                                 {filtered.map((car, idx) => {
                                     const modelYear = car['Model Year'] || car['Driving Year'] || '';
                                     return (
-                                        <div key={idx} onClick={() => onCarClick(car)} className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-accent transition-all group relative overflow-hidden flex flex-col h-full">
+                                        <div key={idx} onClick={() => onCarClick(car)} className="bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-accent transition-all group relative overflow-hidden flex flex-col h-full shadow-md hover:shadow-[0_0_20px_rgba(225,29,72,0.1)]">
+                                            
+                                            {/* Yeni Kart Başlığı: Monogram Badge + Tipografi */}
                                             <div className="flex justify-between items-start mb-4">
-                                                <BrandLogo make={car.Make} className="w-12 h-12 group-hover:scale-110 transition-transform shadow-md" />
-                                                <div className="text-right">
-                                                    <span className={`px-2 py-1 text-[9px] uppercase tracking-widest rounded-md border ${getSegmentStyle(car.Segment)}`}>{car.Segment || 'Standard'}</span>
+                                                <div className="flex items-center gap-3">
+                                                    <BrandBadge make={car.Make} className="w-11 h-11" textSize="text-2xl" />
+                                                    <div>
+                                                        <h4 className="font-bold text-base text-white leading-tight truncate max-w-[120px] sm:max-w-[140px]">{car.Make}</h4>
+                                                        <div className="text-xs text-gray-400 font-medium truncate max-w-[120px] sm:max-w-[140px]">{car.Model}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right flex flex-col items-end gap-1.5 shrink-0">
+                                                    <span className={`px-2 py-0.5 text-[9px] uppercase tracking-widest rounded text-center border ${getSegmentStyle(car.Segment)}`}>{car.Segment || 'Standard'}</span>
+                                                    <span className="text-[10px] font-bold text-gray-400 bg-dark px-1.5 py-0.5 rounded border border-border">{modelYear}</span>
                                                 </div>
                                             </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-bold text-lg text-white mb-1 truncate">{car.Make} {car.Model}</h4>
-                                                <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
-                                                    <span className="bg-dark px-2 py-0.5 rounded text-white border border-border">{modelYear}</span> • <span>{car.Power} hp</span>
+                                            
+                                            {/* Kart Ortası (Detaylar ve Hikaye) */}
+                                            <div className="flex-1 flex flex-col justify-center">
+                                                <div className="flex items-center gap-3 text-xs text-gray-300 mb-3 bg-dark/50 p-2.5 rounded-lg border border-border/50">
+                                                    <div className="flex items-center gap-1 font-medium"><span className="text-accent">⚡</span> {car.Power} hp</div>
+                                                    <div className="w-px h-3 bg-border"></div>
+                                                    <div className="flex items-center gap-1 truncate text-gray-400">{car.Engine > 0 ? `${car.Engine}L ` : ''}{car.Fuel}</div>
                                                 </div>
                                                 {car.Story && (
-                                                    <div className="mt-2 mb-2 text-xs text-gray-400 italic line-clamp-2 border-l-2 border-accent/50 pl-2">
+                                                    <div className="mb-2 text-xs text-gray-400 italic line-clamp-2 border-l-2 border-accent/50 pl-2">
                                                         "{car.Story}"
                                                     </div>
                                                 )}
                                             </div>
+                                            
+                                            {/* Kart Altı (Puan ve KM) */}
                                             <div className="pt-3 border-t border-border flex justify-between items-center mt-auto">
                                                 <CarRating points={car.Points} />
-                                                <span className="text-xs font-medium text-gray-300">{Number(car['Mileage (est)']).toLocaleString()} km</span>
+                                                <span className="text-xs font-medium text-gray-400 bg-dark px-2 py-1 rounded-md border border-border/50">{Number(car['Mileage (est)']).toLocaleString()} km</span>
                                             </div>
                                         </div>
                                     );
@@ -783,7 +790,8 @@
                             </div>
 
                             <div className="flex items-center gap-4 md:gap-6 relative z-10 w-full">
-                                <BrandLogo make={car.Make} className="w-16 h-16 md:w-20 md:h-20 bg-white" />
+                                {/* Detay Sayfasında da Monogram Rozeti Kullanıldı */}
+                                <BrandBadge make={car.Make} className="w-16 h-16 md:w-20 md:h-20" textSize="text-4xl md:text-5xl" />
                                 <div>
                                     <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight">{car.Make}</h2>
                                     <h3 className="text-lg md:text-2xl font-light text-gray-300">{car.Model} <span className="text-accent font-bold">'{targetYear}</span></h3>
@@ -1087,7 +1095,6 @@
                         Transmission: match.Transmission || prev.Transmission, 
                         Drive: match.Drive || prev.Drive, 
                         Segment: match.Segment || prev.Segment,
-                        // Eğer boşsa şık bir Driver's Note ekle
                         Story: prev.Story || `A memorable journey behind the wheel of the ${match.Make} ${match.Model}.`
                     }));
                     setAutoFillStatus('success');
@@ -1224,7 +1231,6 @@
             React.useEffect(() => {
                 if (!user || !isOpen || !isFirebaseEnabled || !db) return;
                 
-                // Firestore Referansı (Kural 1'e uygun)
                 const votesRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_votes');
                 
                 const unsubscribe = onSnapshot(votesRef, (snapshot) => {
@@ -1268,7 +1274,6 @@
                 setHoverRating(0);
                 
                 try {
-                    // Kullanıcının o günkü oyu için eşsiz ID
                     const voteId = `${user.uid}_${todayStr}`;
                     const voteRef = doc(db, 'artifacts', appId, 'public', 'data', 'daily_votes', voteId);
                     
@@ -1369,7 +1374,7 @@
                                 )}
                             </div>
 
-                            {/* YESTERDAY'S CAR SECTION (CLOUD POWERED) */}
+                            {/* YESTERDAY'S CAR SECTION */}
                             <div className="mt-auto border-t border-border pt-5 text-left flex-shrink-0">
                                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Yesterday's Car</div>
                                 <div className="flex flex-col gap-3 bg-dark border border-border/50 rounded-xl p-3 shadow-inner">
@@ -1692,7 +1697,6 @@
                 }
             }, []);
 
-            // Yalnızca LocalStorage Kontrolü (Açılışta)
             React.useEffect(() => {
                 const saved = localStorage.getItem("carbio_data");
                 if (saved) {
@@ -1705,7 +1709,6 @@
                 }
             }, []);
 
-            // --- DEMO PORTFOLIO YÜKLEYİCİ ---
             const loadDemoData = async () => {
                 setIsFetchingDemo(true);
                 const filesToTry = ['./demo.xlsx', './demo.csv']; 
@@ -1722,7 +1725,7 @@
                             
                             if (validCars.length > 0) {
                                 setData(validCars);
-                                setProfileName("Yigit"); // Demo profil ismi
+                                setProfileName("Yigit"); 
                                 isLoaded = true;
                                 break; 
                             }
@@ -1739,7 +1742,6 @@
                 setIsFetchingDemo(false);
             };
 
-            // --- MANUAL REFRESH BUTTON ---
             const triggerRefresh = async () => {
                 setIsFetchingDemo(true);
                 const filesToTry = ['./demo.xlsx', './demo.csv'];
