@@ -172,20 +172,38 @@
             { Make: 'Ferrari', Model: '458', Power: 570, Engine: 4.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' }
         ];
 
-        // --- EXPANDED CAR CULTURE DATABASE ---
+        // --- EXPANDED REAL CAR CULTURE DATABASE ---
         const carCultureDB = {
-            'ferrari458': { games: ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa'], movies: ['Transformers: Dark of the Moon', 'The Wolf of Wall Street'], production: 6000, rarity: 'Ultra Rare' },
-            'ferrari458italia': { games: ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa'], movies: ['Transformers: Dark of the Moon', 'The Wolf of Wall Street'], production: 6000, rarity: 'Ultra Rare' },
-            'porsche911': { games: ['NFS Unbound', 'Gran Turismo 7', 'Forza Motorsport'], movies: ['Bad Boys', 'Atomic Blonde', 'Top Gun: Maverick'], production: 1100000, rarity: 'Rare' },
-            'porsche911carreras': { games: ['NFS Unbound', 'Gran Turismo 7', 'Forza Motorsport'], movies: ['Bad Boys', 'Atomic Blonde', 'Top Gun: Maverick'], production: 1100000, rarity: 'Rare' },
-            'teslamodel3': { games: ['GTA V (Coil Raiden)', 'Forza Horizon 5'], movies: ['Leave the World Behind', 'Don\'t Look Up'], production: 2000000, rarity: 'Common' },
-            'teslamodel3performance': { games: ['GTA V (Coil Raiden)', 'Forza Horizon 5'], movies: ['Leave the World Behind', 'Don\'t Look Up'], production: 2000000, rarity: 'Common' },
-            'fordmustang': { games: ['Need for Speed Heat', 'Forza Horizon 5', 'The Crew Motorfest'], movies: ['John Wick', 'Bullitt', 'Gone in 60 Seconds', 'I Am Legend'], production: 10000000, rarity: 'Common' },
-            'fordmustanggt': { games: ['Need for Speed Heat', 'Forza Horizon 5', 'The Crew Motorfest'], movies: ['John Wick', 'Bullitt', 'Gone in 60 Seconds', 'I Am Legend'], production: 10000000, rarity: 'Common' },
-            'toyotalandcruiser': { games: ['Forza Horizon 5', 'SnowRunner', 'GTA V (Cavalcade)'], movies: ['No Time to Die', 'The Dictator'], production: 10000000, rarity: 'Common' },
-            'volvoxc40': { games: ['GTA V (Gallivanter)', 'City Car Driving'], movies: ['Tomb Raider (2018)'], production: 500000, rarity: 'Common' },
-            'volvoxc40recharge': { games: ['GTA V (Gallivanter)'], movies: ['Tomb Raider (2018)'], production: 500000, rarity: 'Common' },
-            'astonmartindb9': { games: ['NFS Most Wanted', 'Test Drive Unlimited', 'Forza Horizon 4'], movies: ['Fast & Furious 7', 'Casino Royale (as DBS)'], production: 16500, rarity: 'Rare' }
+            'ferrari458': { games: ['Forza Horizon', 'Gran Turismo 7', 'Assetto Corsa'], movies: ['Transformers: Dark of the Moon', 'The Wolf of Wall Street'], production: 15000, rarity: 'Ultra Rare' },
+            'ferrari458italia': { games: ['Forza Horizon', 'Gran Turismo 7', 'Assetto Corsa'], movies: ['Transformers: Dark of the Moon', 'The Wolf of Wall Street'], production: 15000, rarity: 'Ultra Rare' },
+            'porsche911': { games: ['Need for Speed', 'Gran Turismo 7', 'Forza Motorsport'], movies: ['Bad Boys', 'Top Gun: Maverick', 'Cars (Sally)'], production: 1100000, rarity: 'Rare' },
+            'porsche911carreras': { games: ['Need for Speed', 'Gran Turismo 7', 'Forza Horizon'], movies: ['Bad Boys for Life'], production: 1100000, rarity: 'Rare' },
+            'teslamodel3': { games: ['Forza Horizon 5', 'Gran Turismo 7'], movies: ['Leave the World Behind', 'Don\'t Look Up'], production: 2000000, rarity: 'Common' },
+            'teslamodel3performance': { games: ['Forza Horizon 5', 'Gran Turismo 7'], movies: ['Leave the World Behind'], production: 500000, rarity: 'Uncommon' },
+            'fordmustang': { games: ['Need for Speed', 'Forza Horizon', 'The Crew'], movies: ['John Wick', 'Bullitt', 'Gone in 60 Seconds', 'I Am Legend'], production: 10000000, rarity: 'Common' },
+            'fordmustanggt': { games: ['Need for Speed', 'Forza Horizon', 'Gran Turismo'], movies: ['John Wick', 'Bullitt'], production: 10000000, rarity: 'Common' },
+            'toyotalandcruiser': { games: ['Forza Horizon', 'SnowRunner'], movies: ['No Time to Die', 'The Dictator'], production: 10000000, rarity: 'Common' },
+            'volvoxc40': { games: ['Forza Horizon 4'], movies: ['Tomb Raider (2018)'], production: 500000, rarity: 'Common' },
+            'volvoxc40recharge': { games: ['Forza Horizon 5'], movies: [], production: 200000, rarity: 'Uncommon' },
+            'astonmartindb9': { games: ['NFS Most Wanted', 'Test Drive Unlimited', 'Forza Horizon'], movies: ['Fast & Furious 7'], production: 16500, rarity: 'Ultra Rare' },
+            'astonmartinvanquish': { games: ['Need for Speed: Hot Pursuit', 'Forza Horizon'], movies: ['Die Another Day'], production: 2500, rarity: 'Ultra Rare' },
+            'astonmartinvantage': { games: ['Gran Turismo', 'Forza Motorsport'], movies: ['Spectre', 'No Time to Die'], production: 25000, rarity: 'Rare' },
+            'bmwm3': { games: ['Need for Speed: Most Wanted', 'Forza Horizon', 'Gran Turismo'], movies: ['Mission: Impossible - Rogue Nation'], production: 300000, rarity: 'Rare' },
+            'bmw3series': { games: ['Forza Motorsport', 'Gran Turismo'], movies: ['The Chase', 'Ronin'], production: 16000000, rarity: 'Common' },
+            'bmw5series': { games: ['Forza Motorsport'], movies: ['Mission: Impossible - Fallout', 'Ronin'], production: 9000000, rarity: 'Common' },
+            'audia3': { games: ['Forza Horizon', 'Gran Turismo'], movies: ['About a Boy'], production: 4000000, rarity: 'Common' },
+            'audis3': { games: ['Forza Horizon', 'Gran Turismo'], movies: [], production: 200000, rarity: 'Uncommon' },
+            'alfaromeogiulietta': { games: ['Forza Motorsport', 'Gran Turismo'], movies: ['Fast & Furious 6'], production: 400000, rarity: 'Common' },
+            'chevroletcamaro': { games: ['Need for Speed', 'Forza Horizon', 'The Crew'], movies: ['Transformers', '2 Fast 2 Furious'], production: 5000000, rarity: 'Common' },
+            'nissangtr': { games: ['Need for Speed', 'Gran Turismo', 'Forza Horizon'], movies: ['Fast & Furious Franchise', 'Elysium'], production: 40000, rarity: 'Rare' },
+            'nissanskyline': { games: ['Need for Speed: Underground', 'Gran Turismo'], movies: ['2 Fast 2 Furious'], production: 460000, rarity: 'Rare' },
+            'toyotasupra': { games: ['Need for Speed', 'Forza Horizon', 'Gran Turismo'], movies: ['The Fast and the Furious'], production: 500000, rarity: 'Rare' },
+            'volkswagengolf': { games: ['Need for Speed', 'Gran Turismo', 'Forza Horizon'], movies: ['The Fast and the Furious: Tokyo Drift'], production: 35000000, rarity: 'Common' },
+            'peugeot206': { games: ['Need for Speed: Underground'], movies: ['Taken'], production: 8000000, rarity: 'Common' },
+            'fiat500': { games: ['Forza Horizon', 'Gran Turismo'], movies: ['Spectre', 'Mission: Impossible - Dead Reckoning'], production: 6000000, rarity: 'Common' },
+            'minicooper': { games: ['Forza Horizon', 'Gran Turismo'], movies: ['The Italian Job', 'Bourne Identity'], production: 5000000, rarity: 'Common' },
+            'jeepwrangler': { games: ['Forza Horizon', 'SnowRunner'], movies: ['Jurassic Park', 'Tomb Raider'], production: 5000000, rarity: 'Common' },
+            'deloreandmc12': { games: ['Forza Horizon', 'The Crew'], movies: ['Back to the Future', 'Ready Player One'], production: 9000, rarity: 'Ultra Rare' }
         };
 
         const getCarCultureData = (make, model, power, segment) => {
@@ -193,45 +211,37 @@
             const key = normalize(make) + normalize(model);
             let data = carCultureDB[key];
 
+            // Kısmi eşleşme kontrolü (Örn: Model "911 Carrera S" ise ve DB'de "911" varsa onu bulsun)
+            if (!data) {
+                const makeKey = normalize(make);
+                const modelKey = normalize(model);
+                for (const dbKey in carCultureDB) {
+                    if (dbKey.includes(makeKey) && (dbKey.includes(modelKey) || modelKey.includes(dbKey.replace(makeKey, '')))) {
+                        data = carCultureDB[dbKey];
+                        break;
+                    }
+                }
+            }
+
             if (!data) {
                 let estProduction = 5000000;
                 let rarity = 'Common';
-                let games = [];
-                let movies = [];
                 const hp = Number(power) || 100;
                 const seg = String(segment).toLowerCase();
 
-                // Detailed Fallback Pools for Dynamic Assignment
-                const supercarGames = ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa Competizione', 'NFS Unbound', 'The Crew Motorfest', 'Project CARS 3'];
-                const supercarMovies = ['Fast & Furious Franchise', 'Mission: Impossible', 'James Bond: Spectre', 'Iron Man', 'Transformers', 'The Batman'];
-                
-                const sportGames = ['Forza Motorsport', 'NFS Heat', 'Gran Turismo Sport', 'Grid Legends', 'Driveclub'];
-                const sportMovies = ['John Wick', 'The Transporter', 'Baby Driver', 'Ronin', 'Drive', 'Mad Max: Fury Road'];
-                
-                const commonGames = ['GTA V', 'BeamNG.drive', 'City Car Driving', 'Watch Dogs', 'Euro Truck Simulator 2'];
-                const commonMovies = ['The Bourne Identity', 'Inception', 'Breaking Bad', 'The Matrix', 'Jurassic Park'];
-
-                const getRandom = (arr, count) => {
-                    const shuffled = [...arr].sort(() => 0.5 - Math.random());
-                    return shuffled.slice(0, count);
-                };
-
+                // Üretim sayısı ve nadirlik tahminleri devam ediyor ama pop kültür uydurmaları iptal
                 if (hp > 500 || seg.includes('performance') || seg.includes('supercar')) {
                     estProduction = Math.floor(Math.random() * 8000) + 2000; 
                     rarity = 'Ultra Rare'; 
-                    games = getRandom(supercarGames, 3); 
-                    movies = getRandom(supercarMovies, 2);
                 } else if (hp > 300 || seg.includes('luxury')) {
                     estProduction = Math.floor(Math.random() * 150000) + 50000; 
                     rarity = 'Rare'; 
-                    games = getRandom(sportGames, 2); 
-                    movies = getRandom(sportMovies, 2);
                 } else {
                     rarity = 'Common'; 
-                    games = getRandom(commonGames, 2); 
-                    movies = getRandom(commonMovies, 2);
                 }
-                data = { production: estProduction, rarity, games, movies };
+                
+                // UYDURMA VERİ İPTALİ: Veritabanında yoksa boş array döner.
+                data = { production: estProduction, rarity, games: [], movies: [] };
             }
 
             return {
@@ -821,7 +831,7 @@
                                                 {cultureData.games.slice(0,3).map((g,i) => <span key={i} className="text-[10px] bg-card border border-border px-2 py-0.5 rounded-md text-textMain">{g}</span>)}
                                                 {cultureData.games.length > 3 && <span className="text-[10px] text-textMuted px-1">+{cultureData.games.length - 3}</span>}
                                             </div>
-                                        ) : <span className="text-xs text-textMuted italic">No major games.</span>}
+                                        ) : <span className="text-[10px] text-textMuted italic">No verified records.</span>}
                                     </div>
 
                                     {/* Compact Movies */}
@@ -832,7 +842,7 @@
                                                 {cultureData.movies.slice(0,3).map((m,i) => <span key={i} className="text-[10px] bg-card border border-border px-2 py-0.5 rounded-md text-textMain">{m}</span>)}
                                                 {cultureData.movies.length > 3 && <span className="text-[10px] text-textMuted px-1">+{cultureData.movies.length - 3}</span>}
                                             </div>
-                                        ) : <span className="text-xs text-textMuted italic">No major movies.</span>}
+                                        ) : <span className="text-[10px] text-textMuted italic">No verified records.</span>}
                                     </div>
                                 </div>
                             </div>
