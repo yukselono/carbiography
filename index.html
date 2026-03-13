@@ -172,9 +172,20 @@
             { Make: 'Ferrari', Model: '458', Power: 570, Engine: 4.5, Fuel: 'Petrol', Transmission: 'Automatic', Drive: 'RWD', Segment: 'Performance' }
         ];
 
+        // --- EXPANDED CAR CULTURE DATABASE ---
         const carCultureDB = {
-            'ferrari458': { games: ['Forza Horizon 5', 'Gran Turismo 7'], movies: ['Transformers'], production: 6000, rarity: 'Ultra Rare' },
-            'porsche911': { games: ['NFS Unbound', 'Gran Turismo 7'], movies: ['Bad Boys'], production: 1100000, rarity: 'Rare' },
+            'ferrari458': { games: ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa'], movies: ['Transformers: Dark of the Moon', 'The Wolf of Wall Street'], production: 6000, rarity: 'Ultra Rare' },
+            'ferrari458italia': { games: ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa'], movies: ['Transformers: Dark of the Moon', 'The Wolf of Wall Street'], production: 6000, rarity: 'Ultra Rare' },
+            'porsche911': { games: ['NFS Unbound', 'Gran Turismo 7', 'Forza Motorsport'], movies: ['Bad Boys', 'Atomic Blonde', 'Top Gun: Maverick'], production: 1100000, rarity: 'Rare' },
+            'porsche911carreras': { games: ['NFS Unbound', 'Gran Turismo 7', 'Forza Motorsport'], movies: ['Bad Boys', 'Atomic Blonde', 'Top Gun: Maverick'], production: 1100000, rarity: 'Rare' },
+            'teslamodel3': { games: ['GTA V (Coil Raiden)', 'Forza Horizon 5'], movies: ['Leave the World Behind', 'Don\'t Look Up'], production: 2000000, rarity: 'Common' },
+            'teslamodel3performance': { games: ['GTA V (Coil Raiden)', 'Forza Horizon 5'], movies: ['Leave the World Behind', 'Don\'t Look Up'], production: 2000000, rarity: 'Common' },
+            'fordmustang': { games: ['Need for Speed Heat', 'Forza Horizon 5', 'The Crew Motorfest'], movies: ['John Wick', 'Bullitt', 'Gone in 60 Seconds', 'I Am Legend'], production: 10000000, rarity: 'Common' },
+            'fordmustanggt': { games: ['Need for Speed Heat', 'Forza Horizon 5', 'The Crew Motorfest'], movies: ['John Wick', 'Bullitt', 'Gone in 60 Seconds', 'I Am Legend'], production: 10000000, rarity: 'Common' },
+            'toyotalandcruiser': { games: ['Forza Horizon 5', 'SnowRunner', 'GTA V (Cavalcade)'], movies: ['No Time to Die', 'The Dictator'], production: 10000000, rarity: 'Common' },
+            'volvoxc40': { games: ['GTA V (Gallivanter)', 'City Car Driving'], movies: ['Tomb Raider (2018)'], production: 500000, rarity: 'Common' },
+            'volvoxc40recharge': { games: ['GTA V (Gallivanter)'], movies: ['Tomb Raider (2018)'], production: 500000, rarity: 'Common' },
+            'astonmartindb9': { games: ['NFS Most Wanted', 'Test Drive Unlimited', 'Forza Horizon 4'], movies: ['Fast & Furious 7', 'Casino Royale (as DBS)'], production: 16500, rarity: 'Rare' }
         };
 
         const getCarCultureData = (make, model, power, segment) => {
@@ -190,12 +201,35 @@
                 const hp = Number(power) || 100;
                 const seg = String(segment).toLowerCase();
 
+                // Detailed Fallback Pools for Dynamic Assignment
+                const supercarGames = ['Forza Horizon 5', 'Gran Turismo 7', 'Assetto Corsa Competizione', 'NFS Unbound', 'The Crew Motorfest', 'Project CARS 3'];
+                const supercarMovies = ['Fast & Furious Franchise', 'Mission: Impossible', 'James Bond: Spectre', 'Iron Man', 'Transformers', 'The Batman'];
+                
+                const sportGames = ['Forza Motorsport', 'NFS Heat', 'Gran Turismo Sport', 'Grid Legends', 'Driveclub'];
+                const sportMovies = ['John Wick', 'The Transporter', 'Baby Driver', 'Ronin', 'Drive', 'Mad Max: Fury Road'];
+                
+                const commonGames = ['GTA V', 'BeamNG.drive', 'City Car Driving', 'Watch Dogs', 'Euro Truck Simulator 2'];
+                const commonMovies = ['The Bourne Identity', 'Inception', 'Breaking Bad', 'The Matrix', 'Jurassic Park'];
+
+                const getRandom = (arr, count) => {
+                    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+                    return shuffled.slice(0, count);
+                };
+
                 if (hp > 500 || seg.includes('performance') || seg.includes('supercar')) {
-                    estProduction = Math.floor(Math.random() * 8000) + 2000; rarity = 'Ultra Rare'; games = ['Forza Horizon 5']; movies = ['Action Movie'];
+                    estProduction = Math.floor(Math.random() * 8000) + 2000; 
+                    rarity = 'Ultra Rare'; 
+                    games = getRandom(supercarGames, 3); 
+                    movies = getRandom(supercarMovies, 2);
                 } else if (hp > 300 || seg.includes('luxury')) {
-                    estProduction = Math.floor(Math.random() * 150000) + 50000; rarity = 'Rare'; games = ['Need for Speed']; movies = ['Chase Scene'];
+                    estProduction = Math.floor(Math.random() * 150000) + 50000; 
+                    rarity = 'Rare'; 
+                    games = getRandom(sportGames, 2); 
+                    movies = getRandom(sportMovies, 2);
                 } else {
-                    rarity = 'Common'; games = ['City Simulator']; movies = ['Background'];
+                    rarity = 'Common'; 
+                    games = getRandom(commonGames, 2); 
+                    movies = getRandom(commonMovies, 2);
                 }
                 data = { production: estProduction, rarity, games, movies };
             }
